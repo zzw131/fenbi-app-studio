@@ -1,0 +1,232 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "meta": {
+    "project": "粉笔教育 App 界面与跳转结构",
+    "app_name": "粉笔教育（公务员考试备考）",
+    "package_name": "com.fenbi.android.servant",
+    "apk_version": "6.19.6 (arm64)",
+    "apk_download_url": "https://fb.fbstatic.cn/apps/download/gwy-online-arm64-6.19.6.apk",
+    "platform": "Android",
+    "capture_device": "Android Emulator / Android 15 / 1080x2400",
+    "capture_date": "2026-11-19",
+    "description": "粉笔教育 App 的完整页面层级、元素构成与点击跳转关系。数据来源为真机模拟器逐屏截图 + 界面遍历，供 AI 理解界面结构、生成原型或编写自动化测试使用。",
+    "screenshot_dir": "screenshots/",
+    "mindmap_file": "mindmap/粉笔教育App界面与跳转结构.xmind"
+  },
+  "navigation_flow": [
+    {
+      "step": 1,
+      "page": "开屏页（粉笔Logo）",
+      "screenshot": "screenshots/01_用户协议弹窗.png",
+      "note": "冷启动展示品牌Logo后自动进入协议弹窗",
+      "actions": [
+        { "trigger": "启动加载完成", "target": "用户协议弹窗" }
+      ]
+    },
+    {
+      "step": 2,
+      "page": "用户协议和隐私政策弹窗",
+      "screenshot": "screenshots/01_用户协议弹窗.png",
+      "actions": [
+        { "trigger": "点击「同意并继续」", "target": "登录选择页" },
+        { "trigger": "点击「不同意」", "target": "退出App" }
+      ]
+    },
+    {
+      "step": 3,
+      "page": "登录选择页",
+      "screenshot": "screenshots/02_登录选择页.png",
+      "actions": [
+        { "trigger": "点击「随便逛逛」", "target": "安全验证（滑块拼图）" },
+        { "trigger": "点击「短信验证码登录」", "target": "验证码登录页（未采集）" },
+        { "trigger": "点击「账号密码登录」", "target": "密码登录页（未采集）" }
+      ]
+    },
+    {
+      "step": 4,
+      "page": "安全验证（滑块拼图）",
+      "screenshot": null,
+      "note": "第三方滑块验证码，拖动拼图到缺口通过",
+      "actions": [
+        { "trigger": "滑动验证通过", "target": "目标考试选择页" }
+      ]
+    },
+    {
+      "step": 5,
+      "page": "目标考试选择页『你的目标考试是？』",
+      "screenshot": "screenshots/03_目标考试选择.png",
+      "actions": [
+        { "trigger": "选择考试类型（公务员/事业单位/教师招聘/教师资格证/法考/考研/建工等30+类）", "target": "该类二级选择页" }
+      ]
+    },
+    {
+      "step": 6,
+      "page": "公务员考试二级选择",
+      "screenshot": "screenshots/04_公务员考试_笔试面试.png",
+      "actions": [
+        { "trigger": "点击「笔试」", "target": "地区选择页" },
+        { "trigger": "点击「面试」", "target": "面试课程页（未采集）" }
+      ]
+    },
+    {
+      "step": 7,
+      "page": "地区选择页",
+      "screenshot": "screenshots/05_地区选择.png",
+      "actions": [
+        { "trigger": "选择国考/江苏/浙江/广东/山东等省份", "target": "国考类型选择页" }
+      ]
+    },
+    {
+      "step": 8,
+      "page": "国考类型选择页",
+      "screenshot": "screenshots/06_考试类别_国考类型.png",
+      "actions": [
+        { "trigger": "选择副省类/地市类/行政执法类/公安类", "target": "新人福利选择页" }
+      ]
+    },
+    {
+      "step": 9,
+      "page": "新人福利选择页",
+      "screenshot": "screenshots/07_新人福利选择.png",
+      "actions": [
+        { "trigger": "选择资料包/会员/求职答疑/全部都要", "target": "主界面" },
+        { "trigger": "点击「放弃福利」", "target": "主界面" }
+      ]
+    }
+  ],
+  "main_tabs": [
+    {
+      "tab_id": "practice",
+      "label": "练习（首页）",
+      "screenshot": "screenshots/08_首页_练习Tab.png",
+      "elements": [
+        "顶部标签：公考笔试 / 行测 / 申论",
+        "功能入口：模考大赛 / 模考奖学金争霸 / 免费资料 / 会员中心 / 精品服务",
+        "学习工具：笔试系统班 / 模考争霸赛 / 组队打卡",
+        "科目列表"
+      ],
+      "actions": [
+        { "trigger": "点击科目（如政治理论）", "target": "专项智能练习·答题页" }
+      ]
+    },
+    {
+      "tab_id": "course",
+      "label": "课程",
+      "screenshot": "screenshots/09_课程Tab.png",
+      "elements": [
+        "定位地区切换（如安徽）",
+        "分类：公考笔试 / 事业单位 / 就业学院 / 公考面试",
+        "课程卡片列表（含价格、购买人数）"
+      ],
+      "actions": [
+        { "trigger": "点击课程卡片", "target": "课程详情页（未采集）" }
+      ]
+    },
+    {
+      "tab_id": "jobmatch",
+      "label": "选岗（选岗助手）",
+      "screenshot": "screenshots/10_选岗Tab.png",
+      "elements": [
+        "顶部：历年大考 / 国省考汇总 / 职位检索榜 / 选岗教程 / 报名大数据",
+        "公告·职位列表"
+      ],
+      "actions": [
+        { "trigger": "点击选岗入口", "target": "考试类型选择弹窗" },
+        { "trigger": "考试类型选择弹窗 → 确定", "target": "完善信息页" }
+      ],
+      "sub_pages": [
+        {
+          "page": "考试类型选择弹窗",
+          "screenshot": "screenshots/15_选岗助手_考试类型弹窗.png",
+          "elements": ["公务员/事业单位/教师等选项"]
+        },
+        {
+          "page": "完善信息页（精准推荐）",
+          "screenshot": "screenshots/16_选岗助手_完善信息.png",
+          "elements": ["报考地区", "考试类型", "简历填写"]
+        },
+        {
+          "page": "考试选择弹窗（另一入口）",
+          "screenshot": "screenshots/17_选岗助手_考试选择弹窗.png"
+        }
+      ]
+    },
+    {
+      "tab_id": "discover",
+      "label": "发现",
+      "screenshot": "screenshots/11_发现Tab.png",
+      "elements": [
+        "二级标签：推荐 / 圈子 / 干货 / 备考经验 / 关注",
+        "热搜榜 / 每日签到",
+        "内容信息流（AI老师等）+ 发布按钮"
+      ]
+    },
+    {
+      "tab_id": "me",
+      "label": "我",
+      "screenshot": "screenshots/12_我Tab.png",
+      "elements": [
+        "登录/注册入口 + 会员中心 + 备考规划师",
+        "课程日历 / 公开课 / 观看历史 / 缓存下载 / 课程收藏",
+        "我的订单 / 我的钱包 / 优惠券",
+        "我的消息 / 在线客服 / 电话客服"
+      ]
+    }
+  ],
+  "quiz_flow": [
+    {
+      "page": "专项智能练习·答题页",
+      "screenshot": "screenshots/13_答题页.png",
+      "elements": [
+        "顶部工具：关闭 / 计时 / 标记收藏 / 下载 / 笔记 / 答题卡 / 更多",
+        "题型：单选题等",
+        "选题 → 自动判题解析"
+      ],
+      "actions": [
+        { "trigger": "点击「答题卡」", "target": "答题卡弹窗" },
+        { "trigger": "点击顶部「关闭」", "target": "返回练习Tab" }
+      ]
+    },
+    {
+      "page": "答题卡弹窗",
+      "screenshot": "screenshots/14_答题卡弹窗.png",
+      "elements": [
+        "题号网格 1~N",
+        "「交卷」按钮"
+      ],
+      "actions": [
+        { "trigger": "点击题号", "target": "跳到对应题目" },
+        { "trigger": "点击「交卷」", "target": "练习报告/解析页（未采集）" }
+      ]
+    }
+  ],
+  "global_functions": [
+    { "function": "顶部搜索图标", "target": "搜索页（未采集）" },
+    { "function": "右侧宫格菜单", "target": "更多功能（未采集）" },
+    { "function": "返回键", "target": "逐级返回上一级页面" }
+  ],
+  "screenshot_index": [
+    { "file": "01_用户协议弹窗.png", "page": "用户协议弹窗" },
+    { "file": "02_登录选择页.png", "page": "登录选择页" },
+    { "file": "03_目标考试选择.png", "page": "目标考试选择页" },
+    { "file": "04_公务员考试_笔试面试.png", "page": "公务员考试二级" },
+    { "file": "05_地区选择.png", "page": "地区选择页" },
+    { "file": "06_考试类别_国考类型.png", "page": "国考类型选择页" },
+    { "file": "07_新人福利选择.png", "page": "新人福利选择页" },
+    { "file": "08_首页_练习Tab.png", "page": "首页·练习Tab" },
+    { "file": "09_课程Tab.png", "page": "课程Tab" },
+    { "file": "10_选岗Tab.png", "page": "选岗Tab" },
+    { "file": "11_发现Tab.png", "page": "发现Tab" },
+    { "file": "12_我Tab.png", "page": "我Tab" },
+    { "file": "13_答题页.png", "page": "专项智能练习·答题页" },
+    { "file": "14_答题卡弹窗.png", "page": "答题卡弹窗" },
+    { "file": "15_选岗助手_考试类型弹窗.png", "page": "选岗助手·考试类型弹窗" },
+    { "file": "16_选岗助手_完善信息.png", "page": "选岗助手·完善信息页" },
+    { "file": "17_选岗助手_考试选择弹窗.png", "page": "选岗助手·考试选择弹窗" }
+  ],
+  "coverage_notes": {
+    "covered": "启动登录流程、目标定制向导、主界面5个Tab、答题流程、选岗助手二级页面，共17个核心界面",
+    "not_covered": "短信/密码登录子页、课程详情页、职位详情页、搜索页、更多功能宫格页等更深层页面未逐一采集",
+    "note": "以上未采集页面在对应 actions 中均标注为（未采集）"
+  }
+}
