@@ -1,0 +1,5 @@
+{
+  "name": "粉笔教育 App 交互原型",
+  "description": "基于粉笔教育 Android App（v6.19.6）17 个核心界面与跳转结构构建的高保真可交互原型，覆盖启动登录、目标考试定制向导、五大主 Tab、智能刷题与选岗助手。",
+  "requestFramePermissions": []
+}
