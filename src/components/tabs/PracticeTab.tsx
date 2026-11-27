@@ -1,378 +1,1823 @@
-import React, { useState } from 'react';
-import {
-  Search,
-  LayoutGrid,
-  ChevronDown,
-  ChevronRight,
-  Trophy,
-  Award,
-  Inbox,
-  Crown,
-  Sparkles,
-  BookOpen,
-  Users,
-  FileText,
-  X,
-} from 'lucide-react';
-import { AI_TEACHER_AVATAR, ESSAY_BANNER_IMAGE } from '../../data/fenbiData';
+/**
+ * @license
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
+import React, { useRef, useState } from 'react';
 import { ExamProfile, SubjectItem } from '../../types/app';
 
 interface PracticeTabProps {
   examProfile: ExamProfile;
   subjects: SubjectItem[];
+  isMoreMenuOpen: boolean;
   onStartQuiz: (subjectId: string) => void;
   onChangeGoal: () => void;
   onOpenSearch: () => void;
-  onOpenMoreGrid: () => void;
+  onToggleMoreGrid: () => void;
   onOpenFeature: (featureTitle: string) => void;
   onOpenAiTeacher: () => void;
 }
 
-const BANNERS = [
+/**
+ * 金刚区 Icon 1：01_模考大赛 (1:1 还原上传的橙色 3D 奖杯图标)
+ */
+function MockExamIcon() {
+  return (
+    <svg
+      width="42"
+      height="42"
+      viewBox="0 0 120 120"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+      className="shrink-0 pointer-events-none"
+    >
+      <defs>
+        <linearGradient id="mockBg" x1="12" y1="108" x2="108" y2="12" gradientUnits="userSpaceOnUse">
+          <stop offset="0%" stopColor="#F56A00" />
+          <stop offset="55%" stopColor="#FF8519" />
+          <stop offset="100%" stopColor="#FFC845" />
+        </linearGradient>
+        <linearGradient id="cupBody" x1="34" y1="24" x2="84" y2="78" gradientUnits="userSpaceOnUse">
+          <stop offset="0%" stopColor="#FFFDF2" />
+          <stop offset="45%" stopColor="#FFF1B8" />
+          <stop offset="100%" stopColor="#FFCA52" />
+        </linearGradient>
+        <linearGradient id="cupHandle" x1="20" y1="35" x2="98" y2="68" gradientUnits="userSpaceOnUse">
+          <stop offset="0%" stopColor="#FFF2A6" />
+          <stop offset="100%" stopColor="#FFC436" />
+        </linearGradient>
+        <linearGradient id="cupStar" x1="52" y1="38" x2="68" y2="64" gradientUnits="userSpaceOnUse">
+          <stop offset="0%" stopColor="#FFE052" />
+          <stop offset="100%" stopColor="#FF9408" />
+        </linearGradient>
+        <linearGradient id="cupBaseOrange" x1="60" y1="90" x2="60" y2="103" gradientUnits="userSpaceOnUse">
+          <stop offset="0%" stopColor="#FF9626" />
+          <stop offset="100%" stopColor="#EE4400" />
+        </linearGradient>
+        <clipPath id="mockSquircle">
+          <rect x="2" y="2" width="116" height="116" rx="28" />
+        </clipPath>
+      </defs>
+
+      <g clipPath="url(#mockSquircle)">
+        <rect x="2" y="2" width="116" height="116" rx="28" fill="url(#mockBg)" />
+        <circle cx="16" cy="112" r="32" fill="#FFD15C" fillOpacity="0.35" />
+        <circle cx="52" cy="126" r="28" fill="#FFB340" fillOpacity="0.28" />
+        <circle cx="114" cy="64" r="34" fill="#E35500" fillOpacity="0.32" />
+        <circle cx="110" cy="98" r="38" fill="#FF9838" fillOpacity="0.28" />
+
+        <rect
+          x="14"
+          y="74"
+          width="14"
+          height="6"
+          rx="3"
+          transform="rotate(-12 14 74)"
+          fill="#FFF4C2"
+        />
+        <rect
+          x="92"
+          y="73"
+          width="14"
+          height="6"
+          rx="3"
+          transform="rotate(6 92 73)"
+          fill="#FFF4C2"
+        />
+
+        <path
+          d="M34 39H24C21.2 39 19 41.2 19 44V49C19 57.5 25.8 64 34.5 64H37"
+          stroke="url(#cupHandle)"
+          strokeWidth="6.5"
+          strokeLinecap="round"
+        />
+        <path
+          d="M86 39H96C98.8 39 101 41.2 101 44V49C101 57.5 94.2 64 85.5 64H83"
+          stroke="url(#cupHandle)"
+          strokeWidth="6.5"
+          strokeLinecap="round"
+        />
+
+        <rect x="52" y="74" width="16" height="14" rx="2" fill="#FFD966" />
+        <rect x="54" y="74" width="5" height="14" fill="#FFF2B2" fillOpacity="0.7" />
+
+        <path
+          d="M30 31C30 27.1 33.1 24 37 24H83C86.9 24 90 27.1 90 31V46C90 63.7 76.6 78 60 78C43.4 78 30 63.7 30 46V31Z"
+          fill="url(#cupBody)"
+        />
+        <path
+          d="M35.5 28.5C34 30 33.5 34 33.5 41"
+          stroke="white"
+          strokeWidth="3.2"
+          strokeLinecap="round"
+          strokeOpacity="0.85"
+        />
+
+        <path
+          d="M60 36.5L64.1 44.6L73 45.9C74.2 46.1 74.7 47.6 73.8 48.5L67.4 54.7L68.9 63.6C69.1 64.8 67.8 65.7 66.7 65.1L58.8 60.9L50.9 65.1C49.8 65.7 48.5 64.8 48.7 63.6L50.2 54.7L43.8 48.5C42.9 47.6 43.4 46.1 44.6 45.9L53.5 44.6L57.6 36.5C58.1 35.4 59.5 35.4 60 36.5Z"
+          fill="url(#cupStar)"
+        />
+
+        <path
+          d="M43 91C43 87.7 45.7 85 49 85H71C74.3 85 77 87.7 77 91V93H43V91Z"
+          fill="#FFF1B0"
+        />
+        <rect x="37" y="92" width="46" height="10" rx="5" fill="url(#cupBaseOrange)" />
+      </g>
+    </svg>
+  );
+}
+
+/**
+ * 金刚区 Icon 2：02_会员中心 (1:1 还原上传的紫色 3D 皇冠图标)
+ */
+function VipCenterIcon() {
+  return (
+    <svg
+      width="42"
+      height="42"
+      viewBox="0 0 120 120"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+      className="shrink-0 pointer-events-none"
+    >
+      <defs>
+        <linearGradient id="vipBg" x1="14" y1="12" x2="96" y2="112" gradientUnits="userSpaceOnUse">
+          <stop offset="0%" stopColor="#AA78FF" />
+          <stop offset="50%" stopColor="#653BFF" />
+          <stop offset="100%" stopColor="#461CF2" />
+        </linearGradient>
+        <linearGradient id="crownGold" x1="30" y1="30" x2="88" y2="86" gradientUnits="userSpaceOnUse">
+          <stop offset="0%" stopColor="#FFF59E" />
+          <stop offset="48%" stopColor="#FFDA47" />
+          <stop offset="100%" stopColor="#FFA914" />
+        </linearGradient>
+        <linearGradient id="crownBase" x1="25" y1="81" x2="95" y2="94" gradientUnits="userSpaceOnUse">
+          <stop offset="0%" stopColor="#FFF8C4" />
+          <stop offset="55%" stopColor="#FFD859" />
+          <stop offset="100%" stopColor="#F59F18" />
+        </linearGradient>
+        <radialGradient id="ballTop" cx="35%" cy="30%" r="70%">
+          <stop offset="0%" stopColor="#FFFFE0" />
+          <stop offset="55%" stopColor="#FFE052" />
+          <stop offset="100%" stopColor="#FFA818" />
+        </radialGradient>
+        <clipPath id="vipSquircle">
+          <rect x="2" y="2" width="116" height="116" rx="28" />
+        </clipPath>
+      </defs>
+
+      <g clipPath="url(#vipSquircle)">
+        <rect x="2" y="2" width="116" height="116" rx="28" fill="url(#vipBg)" />
+        <circle cx="112" cy="14" r="28" fill="#C49EFF" fillOpacity="0.28" />
+        <circle cx="10" cy="112" r="32" fill="#9E6EFF" fillOpacity="0.28" />
+        <circle cx="108" cy="104" r="36" fill="#8A58FF" fillOpacity="0.32" />
+
+        <path
+          d="M21 46L39.5 55.5C41.2 56.4 43.3 55.8 44.3 54.2L57.5 33.5C58.7 31.6 61.3 31.6 62.5 33.5L75.7 54.2C76.7 55.8 78.8 56.4 80.5 55.5L99 46L89.5 84H30.5L21 46Z"
+          fill="url(#crownGold)"
+        />
+        <path
+          d="M58 34L44.3 54.2C43.3 55.8 41.2 56.4 39.5 55.5L23 47L32 82H47L58 34Z"
+          fill="white"
+          fillOpacity="0.26"
+        />
+
+        <circle cx="21.5" cy="43.5" r="7.5" fill="url(#ballTop)" />
+        <circle cx="60" cy="29.5" r="9.2" fill="url(#ballTop)" />
+        <circle cx="98.5" cy="43.5" r="7.5" fill="url(#ballTop)" />
+
+        <g>
+          <path d="M60 55L48.5 66.5H60V55Z" fill="#DFCCFF" />
+          <path d="M60 55L71.5 66.5H60V55Z" fill="#7C4DFF" />
+          <path d="M60 78L48.5 66.5H60V78Z" fill="#8152FF" />
+          <path d="M60 78L71.5 66.5H60V78Z" fill="#4E1DF5" />
+        </g>
+
+        <rect x="25" y="81" width="70" height="11.5" rx="5.75" fill="url(#crownBase)" />
+        <ellipse cx="34" cy="84.5" rx="6" ry="1.8" fill="white" fillOpacity="0.7" />
+      </g>
+    </svg>
+  );
+}
+
+/**
+ * 金刚区 Icon 3：03_历年试卷 (1:1 还原上传的蓝色 3D 100分试卷图标)
+ */
+function PastPapersIcon() {
+  return (
+    <svg
+      width="42"
+      height="42"
+      viewBox="0 0 120 120"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+      className="shrink-0 pointer-events-none"
+    >
+      <defs>
+        <linearGradient id="paperBg" x1="12" y1="12" x2="108" y2="108" gradientUnits="userSpaceOnUse">
+          <stop offset="0%" stopColor="#33D2FF" />
+          <stop offset="50%" stopColor="#0A78FF" />
+          <stop offset="100%" stopColor="#004BE0" />
+        </linearGradient>
+        <linearGradient id="sheetGrad" x1="26" y1="22" x2="86" y2="98" gradientUnits="userSpaceOnUse">
+          <stop offset="0%" stopColor="#FFFFFF" />
+          <stop offset="65%" stopColor="#E5F2FF" />
+          <stop offset="100%" stopColor="#C2DFFF" />
+        </linearGradient>
+        <linearGradient id="foldGrad" x1="72" y1="22" x2="94" y2="46" gradientUnits="userSpaceOnUse">
+          <stop offset="0%" stopColor="#D9EDFF" />
+          <stop offset="100%" stopColor="#A6D1FF" />
+        </linearGradient>
+        <linearGradient id="badgeGrad" x1="64" y1="68" x2="102" y2="98" gradientUnits="userSpaceOnUse">
+          <stop offset="0%" stopColor="#F5FAFF" />
+          <stop offset="100%" stopColor="#B8DCFF" />
+        </linearGradient>
+        <clipPath id="paperSquircle">
+          <rect x="2" y="2" width="116" height="116" rx="28" />
+        </clipPath>
+      </defs>
+
+      <g clipPath="url(#paperSquircle)">
+        <rect x="2" y="2" width="116" height="116" rx="28" fill="url(#paperBg)" />
+        <circle cx="108" cy="14" r="26" fill="#6BE0FF" fillOpacity="0.28" />
+        <circle cx="14" cy="108" r="34" fill="#42B8FF" fillOpacity="0.28" />
+        <circle cx="108" cy="96" r="34" fill="#3B8CFF" fillOpacity="0.3" />
+
+        <path
+          d="M24 33C24 26.4 29.4 21 36 21H71.5L94 43.5V89C94 95.6 88.6 101 82 101H36C29.4 101 24 95.6 24 89V33Z"
+          fill="url(#sheetGrad)"
+        />
+        <path
+          d="M71.5 21V37.5C71.5 40.8 74.2 43.5 77.5 43.5H94L71.5 21Z"
+          fill="url(#foldGrad)"
+        />
+
+        <rect x="36" y="42.5" width="29" height="6.8" rx="3.4" fill="#82BCFF" />
+        <rect x="36" y="56.5" width="45" height="6.8" rx="3.4" fill="#82BCFF" />
+        <rect x="36" y="70.5" width="23" height="6.8" rx="3.4" fill="#82BCFF" />
+
+        <rect
+          x="61"
+          y="68"
+          width="43"
+          height="31"
+          rx="9"
+          fill="url(#badgeGrad)"
+          stroke="white"
+          strokeWidth="0.8"
+          strokeOpacity="0.7"
+        />
+        <text
+          x="82.5"
+          y="89.5"
+          textAnchor="middle"
+          fill="#0062EB"
+          fontSize="18.5"
+          fontWeight="900"
+          fontFamily="'PingFang SC', '苹方-简', -apple-system, BlinkMacSystemFont, sans-serif"
+          letterSpacing="-0.5"
+        >
+          100
+        </text>
+      </g>
+    </svg>
+  );
+}
+
+/**
+ * 金刚区 Icon 4：04_快速练习 (1:1 还原上传的薄荷绿 3D 铅笔图标)
+ */
+function QuickPracticeIcon() {
+  return (
+    <svg
+      width="42"
+      height="42"
+      viewBox="0 0 120 120"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+      className="shrink-0 pointer-events-none"
+    >
+      <defs>
+        <linearGradient id="quickBg" x1="12" y1="12" x2="108" y2="108" gradientUnits="userSpaceOnUse">
+          <stop offset="0%" stopColor="#35F2B0" />
+          <stop offset="50%" stopColor="#00CF86" />
+          <stop offset="100%" stopColor="#00A666" />
+        </linearGradient>
+        <linearGradient id="qEraser" x1="70" y1="18" x2="98" y2="46" gradientUnits="userSpaceOnUse">
+          <stop offset="0%" stopColor="#FFF28C" />
+          <stop offset="55%" stopColor="#FFC226" />
+          <stop offset="100%" stopColor="#F58D00" />
+        </linearGradient>
+        <linearGradient id="qWood" x1="36" y1="68" x2="58" y2="88" gradientUnits="userSpaceOnUse">
+          <stop offset="0%" stopColor="#FFFBF0" />
+          <stop offset="100%" stopColor="#FBE0B4" />
+        </linearGradient>
+        <clipPath id="quickSquircle">
+          <rect x="2" y="2" width="116" height="116" rx="28" />
+        </clipPath>
+      </defs>
+
+      <g clipPath="url(#quickSquircle)">
+        <rect x="2" y="2" width="116" height="116" rx="28" fill="url(#quickBg)" />
+        <circle cx="110" cy="16" r="24" fill="#69FFD0" fillOpacity="0.25" />
+        <circle cx="14" cy="110" r="30" fill="#69FFD0" fillOpacity="0.28" />
+        <circle cx="106" cy="100" r="34" fill="#45F5B8" fillOpacity="0.25" />
+
+        <rect
+          x="29"
+          y="33"
+          width="6.5"
+          height="14"
+          rx="3.25"
+          transform="rotate(-25 29 33)"
+          fill="#E5FFF6"
+        />
+        <rect
+          x="17"
+          y="48"
+          width="6.5"
+          height="14"
+          rx="3.25"
+          transform="rotate(-58 17 48)"
+          fill="#E5FFF6"
+        />
+
+        <rect x="40" y="98" width="45" height="6.8" rx="3.4" fill="#DCFFF3" />
+
+        <path
+          d="M68 27L74.5 20.5C79.5 15.5 87.5 15.5 92.5 20.5L99.5 27.5C104.5 32.5 104.5 40.5 99.5 45.5L93 52L68 27Z"
+          fill="url(#qEraser)"
+        />
+        <path d="M62.5 32.5L68 27L93 52L87.5 57.5L62.5 32.5Z" fill="#00DF94" />
+        <path d="M62.5 32.5L68 27L78 37L72.5 42.5L62.5 32.5Z" fill="#DCFFF4" />
+
+        <path d="M62.5 32.5L36.5 64.5L44.5 72.5L71 41L62.5 32.5Z" fill="#F5FFFC" />
+        <path d="M71 41L44.5 72.5L53.5 81.5L79.5 49.5L71 41Z" fill="#BCFAE5" />
+        <path d="M79.5 49.5L53.5 81.5L62.5 86.5L87.5 57.5L79.5 49.5Z" fill="#48EBBA" />
+
+        <path
+          d="M36.5 64.5C38 70 42.5 73 47 72.5C47.5 78 51.5 82 56.5 82C57.5 85.5 60 87 62.5 86.5L45.5 93L34 83.5L36.5 64.5Z"
+          fill="url(#qWood)"
+        />
+        <path
+          d="M34.8 83.2C38.5 83.2 42.2 85.5 44.2 88.8C45.5 91 45.8 92.5 45.5 93.2L36.5 96.2C34.2 97 32.8 95.5 33.4 93.2L34.8 83.2Z"
+          fill="#2D3552"
+        />
+      </g>
+    </svg>
+  );
+}
+
+/**
+ * 金刚区右滑随机 Icon 5：错题本 (珊瑚红 3D 错题本图标)
+ */
+function ErrorBookIcon() {
+  return (
+    <svg
+      width="42"
+      height="42"
+      viewBox="0 0 120 120"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+      className="shrink-0 pointer-events-none"
+    >
+      <defs>
+        <linearGradient id="errBg" x1="12" y1="12" x2="108" y2="108" gradientUnits="userSpaceOnUse">
+          <stop offset="0%" stopColor="#FF758F" />
+          <stop offset="55%" stopColor="#FF4769" />
+          <stop offset="100%" stopColor="#E61E4D" />
+        </linearGradient>
+        <linearGradient id="errBook" x1="28" y1="22" x2="90" y2="98" gradientUnits="userSpaceOnUse">
+          <stop offset="0%" stopColor="#FFFFFF" />
+          <stop offset="100%" stopColor="#FFD6E0" />
+        </linearGradient>
+        <clipPath id="errSquircle">
+          <rect x="2" y="2" width="116" height="116" rx="28" />
+        </clipPath>
+      </defs>
+      <g clipPath="url(#errSquircle)">
+        <rect x="2" y="2" width="116" height="116" rx="28" fill="url(#errBg)" />
+        <circle cx="106" cy="18" r="26" fill="#FFA3B5" fillOpacity="0.3" />
+        <circle cx="14" cy="106" r="32" fill="#FF8FA5" fillOpacity="0.28" />
+        <rect x="28" y="22" width="64" height="76" rx="12" fill="url(#errBook)" />
+        <rect x="22" y="34" width="12" height="6" rx="3" fill="#FFE8EE" />
+        <rect x="22" y="57" width="12" height="6" rx="3" fill="#FFE8EE" />
+        <rect x="22" y="80" width="12" height="6" rx="3" fill="#FFE8EE" />
+        <path
+          d="M50 43L70 63M70 43L50 63"
+          stroke="#FF3B61"
+          strokeWidth="6.5"
+          strokeLinecap="round"
+        />
+        <rect x="44" y="76" width="32" height="6.5" rx="3.25" fill="#FF8DA3" />
+      </g>
+    </svg>
+  );
+}
+
+/**
+ * 金刚区右滑随机 Icon 6：收藏夹 (琥珀金粉 3D 收藏星标图标)
+ */
+function FavoritesIcon() {
+  return (
+    <svg
+      width="42"
+      height="42"
+      viewBox="0 0 120 120"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+      className="shrink-0 pointer-events-none"
+    >
+      <defs>
+        <linearGradient id="favBg" x1="12" y1="12" x2="108" y2="108" gradientUnits="userSpaceOnUse">
+          <stop offset="0%" stopColor="#FFB84D" />
+          <stop offset="55%" stopColor="#FF7A33" />
+          <stop offset="100%" stopColor="#F04826" />
+        </linearGradient>
+        <linearGradient id="favStar" x1="35" y1="25" x2="85" y2="92" gradientUnits="userSpaceOnUse">
+          <stop offset="0%" stopColor="#FFFFF0" />
+          <stop offset="50%" stopColor="#FFE885" />
+          <stop offset="100%" stopColor="#FFB82E" />
+        </linearGradient>
+        <clipPath id="favSquircle">
+          <rect x="2" y="2" width="116" height="116" rx="28" />
+        </clipPath>
+      </defs>
+      <g clipPath="url(#favSquircle)">
+        <rect x="2" y="2" width="116" height="116" rx="28" fill="url(#favBg)" />
+        <circle cx="106" cy="18" r="28" fill="#FFD685" fillOpacity="0.3" />
+        <circle cx="16" cy="106" r="32" fill="#FFAE66" fillOpacity="0.28" />
+        <path
+          d="M60 22L69.8 43.2L93 46.2C96.2 46.6 97.5 50.5 95.1 52.7L78.1 68.8L82.4 91.8C83 95 79.6 97.4 76.7 95.8L56.2 84.6L35.7 95.8C32.8 97.4 29.4 95 30 91.8L34.3 68.8L17.3 52.7C14.9 50.5 16.2 46.6 19.4 46.2L42.6 43.2L52.4 22C53.8 19 58.6 19 60 22Z"
+          transform="translate(3.8, 0)"
+          fill="url(#favStar)"
+        />
+        <circle cx="53" cy="46" r="4" fill="white" fillOpacity="0.7" />
+      </g>
+    </svg>
+  );
+}
+
+/**
+ * 金刚区右滑随机 Icon 7：申论批改 (靛蓝 3D 智能印章图标)
+ */
+function EssayGradingIcon() {
+  return (
+    <svg
+      width="42"
+      height="42"
+      viewBox="0 0 120 120"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+      className="shrink-0 pointer-events-none"
+    >
+      <defs>
+        <linearGradient id="essayBg" x1="12" y1="12" x2="108" y2="108" gradientUnits="userSpaceOnUse">
+          <stop offset="0%" stopColor="#6B8AFF" />
+          <stop offset="55%" stopColor="#4258FF" />
+          <stop offset="100%" stopColor="#2635D9" />
+        </linearGradient>
+        <linearGradient id="essayCard" x1="28" y1="24" x2="90" y2="96" gradientUnits="userSpaceOnUse">
+          <stop offset="0%" stopColor="#FFFFFF" />
+          <stop offset="100%" stopColor="#D6E2FF" />
+        </linearGradient>
+        <clipPath id="essaySquircle">
+          <rect x="2" y="2" width="116" height="116" rx="28" />
+        </clipPath>
+      </defs>
+      <g clipPath="url(#essaySquircle)">
+        <rect x="2" y="2" width="116" height="116" rx="28" fill="url(#essayBg)" />
+        <circle cx="106" cy="18" r="28" fill="#99B0FF" fillOpacity="0.28" />
+        <circle cx="16" cy="106" r="32" fill="#7D96FF" fillOpacity="0.26" />
+        <rect x="26" y="23" width="68" height="74" rx="14" fill="url(#essayCard)" />
+        <rect x="38" y="38" width="32" height="6.5" rx="3.25" fill="#7A96FF" />
+        <rect x="38" y="52" width="44" height="6.5" rx="3.25" fill="#7A96FF" />
+        <circle cx="75" cy="76" r="14" fill="#FFD43B" />
+        <path
+          d="M69.5 76L73.5 80L81.5 72"
+          stroke="#7A4600"
+          strokeWidth="3.5"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        />
+      </g>
+    </svg>
+  );
+}
+
+/**
+ * 金刚区右滑随机 Icon 8：每日一练 (青蓝 3D 日历打卡图标)
+ */
+function DailyPracticeIcon() {
+  return (
+    <svg
+      width="42"
+      height="42"
+      viewBox="0 0 120 120"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+      className="shrink-0 pointer-events-none"
+    >
+      <defs>
+        <linearGradient id="dailyBg" x1="12" y1="12" x2="108" y2="108" gradientUnits="userSpaceOnUse">
+          <stop offset="0%" stopColor="#2CE6D8" />
+          <stop offset="55%" stopColor="#00B8BA" />
+          <stop offset="100%" stopColor="#008C99" />
+        </linearGradient>
+        <linearGradient id="dailyCard" x1="26" y1="28" x2="94" y2="96" gradientUnits="userSpaceOnUse">
+          <stop offset="0%" stopColor="#FFFFFF" />
+          <stop offset="100%" stopColor="#CFFAF7" />
+        </linearGradient>
+        <clipPath id="dailySquircle">
+          <rect x="2" y="2" width="116" height="116" rx="28" />
+        </clipPath>
+      </defs>
+      <g clipPath="url(#dailySquircle)">
+        <rect x="2" y="2" width="116" height="116" rx="28" fill="url(#dailyBg)" />
+        <circle cx="106" cy="18" r="28" fill="#80FFF5" fillOpacity="0.28" />
+        <circle cx="16" cy="106" r="32" fill="#5CECE0" fillOpacity="0.26" />
+        <rect x="25" y="29" width="70" height="67" rx="14" fill="url(#dailyCard)" />
+        <rect x="40" y="21" width="8" height="15" rx="4" fill="#FFE066" />
+        <rect x="72" y="21" width="8" height="15" rx="4" fill="#FFE066" />
+        <path
+          d="M46 64L56 74L76 54"
+          stroke="#00A8AD"
+          strokeWidth="7"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        />
+      </g>
+    </svg>
+  );
+}
+
+/**
+ * 图3 1:1 还原：3D 高光彩色铅笔图标（已激活状态）
+ */
+function ActivePencilIcon({ idSuffix }: { idSuffix: string }) {
+  return (
+    <svg
+      width="20"
+      height="20"
+      viewBox="0 0 100 100"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+      className="shrink-0"
+    >
+      <defs>
+        <linearGradient id={`eraser-${idSuffix}`} x1="60" y1="12" x2="88" y2="40" gradientUnits="userSpaceOnUse">
+          <stop offset="0%" stopColor="#FFF36D" />
+          <stop offset="38%" stopColor="#FFD426" />
+          <stop offset="78%" stopColor="#FF9E1B" />
+          <stop offset="100%" stopColor="#F2730C" />
+        </linearGradient>
+
+        <linearGradient id={`ferrule-${idSuffix}`} x1="50" y1="22" x2="78" y2="50" gradientUnits="userSpaceOnUse">
+          <stop offset="0%" stopColor="#B8D4FF" />
+          <stop offset="22%" stopColor="#FFFFFF" />
+          <stop offset="52%" stopColor="#B0CCFF" />
+          <stop offset="82%" stopColor="#6D9BF2" />
+          <stop offset="100%" stopColor="#9BC0FF" />
+        </linearGradient>
+
+        <linearGradient id={`bodyLeft-${idSuffix}`} x1="28" y1="44" x2="56" y2="30" gradientUnits="userSpaceOnUse">
+          <stop offset="0%" stopColor="#26C6FF" />
+          <stop offset="100%" stopColor="#1499FF" />
+        </linearGradient>
+
+        <linearGradient id={`bodyMid-${idSuffix}`} x1="33" y1="50" x2="62" y2="36" gradientUnits="userSpaceOnUse">
+          <stop offset="0%" stopColor="#0982FF" />
+          <stop offset="100%" stopColor="#0062E6" />
+        </linearGradient>
+
+        <linearGradient id={`bodyRight-${idSuffix}`} x1="42" y1="52" x2="54" y2="64" gradientUnits="userSpaceOnUse">
+          <stop offset="0%" stopColor="#004AD1" />
+          <stop offset="70%" stopColor="#003EB8" />
+          <stop offset="100%" stopColor="#3B93FF" />
+        </linearGradient>
+
+        <linearGradient id={`wood-${idSuffix}`} x1="23" y1="58" x2="42" y2="77" gradientUnits="userSpaceOnUse">
+          <stop offset="0%" stopColor="#FFF3DC" />
+          <stop offset="32%" stopColor="#FFE1B3" />
+          <stop offset="72%" stopColor="#FCC178" />
+          <stop offset="100%" stopColor="#EDA054" />
+        </linearGradient>
+
+        <linearGradient id={`lead-${idSuffix}`} x1="18" y1="73" x2="31" y2="85" gradientUnits="userSpaceOnUse">
+          <stop offset="0%" stopColor="#5D6B99" />
+          <stop offset="45%" stopColor="#252E54" />
+          <stop offset="85%" stopColor="#121738" />
+          <stop offset="100%" stopColor="#3D4C82" />
+        </linearGradient>
+      </defs>
+
+      <path
+        d="M57 22L63.5 15.5C69.5 9.5 79 9.5 85 15.5C91 21.5 91 31 85 37L78.5 43.5L57 22Z"
+        fill={`url(#eraser-${idSuffix})`}
+      />
+      <ellipse
+        cx="68.5"
+        cy="17"
+        rx="4.2"
+        ry="2.2"
+        transform="rotate(-12 68.5 17)"
+        fill="white"
+        fillOpacity="0.82"
+      />
+      <path
+        d="M84 26C85.5 30 84.5 34.5 81 38"
+        stroke="white"
+        strokeWidth="1.5"
+        strokeLinecap="round"
+        strokeOpacity="0.45"
+      />
+
+      <path
+        d="M50.5 27.5L27.5 55.5C27.5 59.5 31 61 35 59L57.5 34.5L50.5 27.5Z"
+        fill={`url(#bodyLeft-${idSuffix})`}
+      />
+      <path
+        d="M57.5 34.5L35 59C37 64 41.5 66 45.5 65L66 43L57.5 34.5Z"
+        fill={`url(#bodyMid-${idSuffix})`}
+      />
+      <path
+        d="M66 43L45.5 65C46 69.5 49 72 52 71.5L73.5 50.5L66 43Z"
+        fill={`url(#bodyRight-${idSuffix})`}
+      />
+      <rect
+        x="46"
+        y="31.5"
+        width="4.6"
+        height="19"
+        rx="2.3"
+        transform="rotate(42 46 31.5)"
+        fill="white"
+        fillOpacity="0.65"
+      />
+
+      <path
+        d="M50.5 26.5C49.5 25.5 49.5 24 50.5 23L54 19.5C55 18.5 56.5 18.5 57.5 19.5L81 43C82 44 82 45.5 81 46.5L77.5 50C76.5 51 75 51 74 50L50.5 26.5Z"
+        fill={`url(#ferrule-${idSuffix})`}
+      />
+      <path
+        d="M51.5 25.8L74.8 49"
+        stroke="#6292EB"
+        strokeWidth="0.9"
+        strokeOpacity="0.6"
+      />
+
+      <path
+        d="M27.5 55.5C28 59.8 31.5 60.8 35.2 58.8C36.8 63.8 41.2 66 45.5 64.8C45.8 69.5 48.8 71.8 51.8 71.2L34 80.5L20.5 67L27.5 55.5Z"
+        fill={`url(#wood-${idSuffix})`}
+      />
+      <path
+        d="M27.5 55.5C28 59.5 31.2 60.5 34.8 58.8L25 71.5L20.5 67L27.5 55.5Z"
+        fill="#FFF7E8"
+        fillOpacity="0.65"
+      />
+
+      <path
+        d="M22.2 69.2C25.5 68.5 29.5 70.5 32 73.5C34.2 76.2 35 79.5 34 81.2L22.5 85.2C19.5 86.2 17.2 83.8 18.2 80.8L22.2 69.2Z"
+        fill={`url(#lead-${idSuffix})`}
+      />
+      <path
+        d="M23.8 70.8C25.2 70.8 26.5 71.8 26.2 73.2L21.5 82.2C20.8 83.2 19.8 82.5 20.1 81.2L23.8 70.8Z"
+        fill="white"
+        fillOpacity="0.65"
+      />
+    </svg>
+  );
+}
+
+/**
+ * 图2 1:1 还原：3D 果冻蓝描边空心铅笔图标（未激活状态）
+ */
+function InactivePencilIcon({ idSuffix }: { idSuffix: string }) {
+  return (
+    <svg
+      width="20"
+      height="20"
+      viewBox="0 0 100 100"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+      className="shrink-0"
+    >
+      <defs>
+        <linearGradient id={`outlineBlue-${idSuffix}`} x1="20" y1="84" x2="84" y2="16" gradientUnits="userSpaceOnUse">
+          <stop offset="0%" stopColor="#2684FF" />
+          <stop offset="50%" stopColor="#4CA0FF" />
+          <stop offset="100%" stopColor="#63B3FF" />
+        </linearGradient>
+        <linearGradient id={`tipFill-${idSuffix}`} x1="18" y1="84" x2="32" y2="70" gradientUnits="userSpaceOnUse">
+          <stop offset="0%" stopColor="#2280FF" />
+          <stop offset="75%" stopColor="#4DA0FF" />
+          <stop offset="100%" stopColor="#8CC8FF" />
+        </linearGradient>
+      </defs>
+
+      <path
+        d="M59 20.5C65.2 14.3 75.3 14.3 81.5 20.5C87.7 26.7 87.7 36.8 81.5 43L44 80.5C41.8 82.7 38.8 84.1 35.7 84.6L21.8 86.8C18.8 87.3 16.2 84.7 16.7 81.7L18.9 67.8C19.4 64.7 20.8 61.7 23 59.5L59 20.5Z"
+        stroke={`url(#outlineBlue-${idSuffix})`}
+        strokeWidth="6.2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <path
+        d="M56.5 23.5L78.5 45.5"
+        stroke={`url(#outlineBlue-${idSuffix})`}
+        strokeWidth="6"
+        strokeLinecap="round"
+      />
+      <path
+        d="M24.5 58.5L45 79"
+        stroke={`url(#outlineBlue-${idSuffix})`}
+        strokeWidth="6"
+        strokeLinecap="round"
+      />
+      <path
+        d="M17.5 82.5L20 69.5L34 83.5L21 86C18.8 86.4 17.1 84.7 17.5 82.5Z"
+        fill={`url(#tipFill-${idSuffix})`}
+      />
+      <path
+        d="M60 21.5C65.6 15.9 74.6 15.9 80.2 21.5C85.8 27.1 85.8 36.1 80.2 41.7L43 78.9"
+        stroke="white"
+        strokeWidth="1.7"
+        strokeLinecap="round"
+        strokeOpacity="0.55"
+      />
+      <path
+        d="M24 58.5L58.5 22.5"
+        stroke="white"
+        strokeWidth="1.7"
+        strokeLinecap="round"
+        strokeOpacity="0.55"
+      />
+      <path
+        d="M57.5 24.5L77.5 44.5"
+        stroke="#B8E0FF"
+        strokeWidth="1.6"
+        strokeLinecap="round"
+        strokeOpacity="0.65"
+      />
+      <path
+        d="M25.5 59.5L44 78"
+        stroke="#B8E0FF"
+        strokeWidth="1.6"
+        strokeLinecap="round"
+        strokeOpacity="0.65"
+      />
+      <ellipse
+        cx="79"
+        cy="22.5"
+        rx="3.2"
+        ry="1.5"
+        transform="rotate(42 79 22.5)"
+        fill="white"
+        fillOpacity="0.85"
+      />
+      <ellipse
+        cx="21.5"
+        cy="79"
+        rx="2"
+        ry="3.8"
+        transform="rotate(15 21.5 79)"
+        fill="white"
+        fillOpacity="0.55"
+      />
+    </svg>
+  );
+}
+
+/**
+ * 5 支铅笔进度条组件
+ */
+function PencilProgressRow({
+  activeCount,
+  countText,
+  rowKey,
+  className = 'mt-1',
+}: {
+  activeCount: number;
+  countText: string;
+  rowKey: string;
+  className?: string;
+}) {
+  return (
+    <div className={`flex items-center ${className}`}>
+      <div className="flex items-center gap-[4px]">
+        {[0, 1, 2, 3, 4].map((index) =>
+          index < activeCount ? (
+            <ActivePencilIcon key={index} idSuffix={`${rowKey}-${index}`} />
+          ) : (
+            <InactivePencilIcon key={index} idSuffix={`${rowKey}-${index}`} />
+          )
+        )}
+      </div>
+      <span className="ml-2.5 text-[13.5px] text-[#595959] font-normal tabular-nums leading-none">
+        {countText}
+      </span>
+    </div>
+  );
+}
+
+/**
+ * 金刚区下方横向滚动插图贴图列表（直接采用 <img> 贴图展示）
+ */
+const PROMO_CARD_IMAGES = [
+  { id: '01', src: '/promo/01_chaozhi.png', alt: '超值精品班' },
+  { id: '02', src: '/promo/02_quancheng.png', alt: '全程护航班' },
+  { id: '03', src: '/promo/03_bishi.png', alt: '笔试系统班' },
+  { id: '04', src: '/promo/04_mokao.png', alt: '模考争霸赛' },
+  { id: '05', src: '/promo/05_zudui.png', alt: '组队打卡营' },
+  { id: '06', src: '/promo/06_xingce.png', alt: '行测会员' },
+  { id: '07', src: '/promo/07_xuexi.png', alt: '学习中心' },
+  { id: '08', src: '/promo/08_redian.png', alt: '全年热点' },
+];
+
+const PROMO_CARD_PAGES = [
+  [PROMO_CARD_IMAGES[0], PROMO_CARD_IMAGES[1]],
+  [PROMO_CARD_IMAGES[2], PROMO_CARD_IMAGES[3]],
+  [PROMO_CARD_IMAGES[4], PROMO_CARD_IMAGES[5]],
+  [PROMO_CARD_IMAGES[6], PROMO_CARD_IMAGES[7]],
+];
+
+/**
+ * 金刚区下方分页轮播推广贴图栏（每次固定展示 2 张，整页切换不自由滚动）
+ */
+function PromoCardsScroller({ onSelectPromo }: { onSelectPromo: (title: string) => void }) {
+  const [promoPage, setPromoPage] = useState(0);
+
+  return (
+    <div className="px-3.5 pt-3">
+      <SwipeCarousel
+        activeIndex={promoPage}
+        onChange={setPromoPage}
+        className="w-full"
+      >
+        {PROMO_CARD_PAGES.map((pair, pageIdx) => (
+          <div key={pageIdx} className="w-full grid grid-cols-2 gap-2.5">
+            {pair.map((item) => (
+              <button
+                key={`${pageIdx}-${item.id}`}
+                type="button"
+                onClick={() => onSelectPromo(item.alt)}
+                className="w-full aspect-[1500/760] rounded-[12px] overflow-hidden p-0 border-0 bg-transparent cursor-pointer flex items-center justify-center"
+                aria-label={item.alt}
+              >
+                <img
+                  src={item.src}
+                  alt={item.alt}
+                  referrerPolicy="no-referrer"
+                  draggable={false}
+                  className="w-full h-full object-contain block pointer-events-none select-none"
+                />
+              </button>
+            ))}
+          </div>
+        ))}
+      </SwipeCarousel>
+
+      {/* 分页指示圆点 */}
+      <div className="flex justify-center items-center gap-[6px] pt-2">
+        {PROMO_CARD_PAGES.map((_, idx) => (
+          <button
+            key={idx}
+            type="button"
+            aria-label={`切换到推广卡片第 ${idx + 1} 页`}
+            onClick={() => setPromoPage(idx)}
+            className={`h-[4.5px] rounded-full transition-all duration-200 cursor-pointer ${
+              promoPage === idx
+                ? 'w-[12px] bg-[#3478F6]'
+                : 'w-[4.5px] bg-[#C5CAD6]'
+            }`}
+          />
+        ))}
+      </div>
+    </div>
+  );
+}
+
+const KINGKONG_PAGES = [
+  [
+    { id: 'mock', label: '模考大赛', Icon: MockExamIcon },
+    { id: 'vip', label: '会员中心', Icon: VipCenterIcon },
+    { id: 'papers', label: '历年试卷', Icon: PastPapersIcon },
+    { id: 'quick', label: '快速练习', Icon: QuickPracticeIcon },
+  ],
+  [
+    { id: 'errorbook', label: '错题本', Icon: ErrorBookIcon },
+    { id: 'favorites', label: '收藏夹', Icon: FavoritesIcon },
+    { id: 'grading', label: '申论批改', Icon: EssayGradingIcon },
+    { id: 'daily', label: '每日一练', Icon: DailyPracticeIcon },
+  ],
+];
+
+interface SubTopicLeaf {
+  id: string;
+  title: string;
+  progress: string;
+}
+
+interface SecondaryCategory {
+  id: string;
+  title: string;
+  activePencils: number;
+  progress: string;
+  hasContinue?: boolean;
+  nestedCard?: {
+    id: string;
+    title: string;
+    activePencils: number;
+    progress: string;
+    leaves: SubTopicLeaf[];
+  };
+}
+
+interface PrimaryCategory {
+  id: string;
+  title: string;
+  activePencils: number;
+  progress: string;
+  hasContinue?: boolean;
+  children: SecondaryCategory[];
+}
+
+const QUESTION_BANK_DATA: PrimaryCategory[] = [
   {
-    id: 1,
-    title: '国考申论 一类模版文章',
-    bullets: ['国考作文保二类争一类', '龙哥带你快速破局'],
-    lecturer: '张小龙',
-    badge: '1/8',
+    id: 'politics',
+    title: '政治理论',
+    activePencils: 2,
+    progress: '0/2314',
+    hasContinue: true,
+    children: [
+      {
+        id: 'marxism',
+        title: '马克思主义',
+        activePencils: 1,
+        progress: '0/372',
+        hasContinue: true,
+        nestedCard: {
+          id: 'philosophy',
+          title: '马克思主义哲学',
+          activePencils: 2,
+          progress: '0/353',
+          leaves: [
+            { id: 'zonglun', title: '总论', progress: '0/6' },
+            { id: 'weiwulun', title: '唯物论', progress: '0/39' },
+            { id: 'bianzhengfa', title: '唯物辩证法', progress: '0/181' },
+            { id: 'renshilun', title: '认识论', progress: '0/72' },
+            { id: 'weiwushiguan', title: '唯物史观', progress: '0/50' },
+            { id: 'qita', title: '哲学-其他', progress: '0/7' },
+          ],
+        },
+      },
+      {
+        id: 'econ',
+        title: '马克思主义政治经济学',
+        activePencils: 0,
+        progress: '0/16',
+      },
+      {
+        id: 'socialism',
+        title: '科学社会主义',
+        activePencils: 0,
+        progress: '0/3',
+      },
+      {
+        id: 'newthought',
+        title: '新思想',
+        activePencils: 0,
+        progress: '0/131',
+      },
+    ],
   },
   {
-    id: 2,
-    title: '第 16 季模考大赛 冲刺排位',
-    bullets: ['万人同台智能估分', '考前精准查漏补缺'],
-    lecturer: '粉笔教研',
-    badge: '2/8',
+    id: 'commonsense',
+    title: '常识判断',
+    activePencils: 1,
+    progress: '0/4620',
+    hasContinue: true,
+    children: [
+      { id: 'cs-law', title: '法律常识', activePencils: 1, progress: '0/1420' },
+      { id: 'cs-econ', title: '经济常识', activePencils: 0, progress: '0/860' },
+      { id: 'cs-hum', title: '人文历史', activePencils: 0, progress: '0/1240' },
+      { id: 'cs-tech', title: '科技地理', activePencils: 0, progress: '0/1100' },
+    ],
+  },
+  {
+    id: 'verbal',
+    title: '言语理解与表达',
+    activePencils: 3,
+    progress: '0/5890',
+    hasContinue: true,
+    children: [
+      { id: 'vb-reading', title: '片段阅读', activePencils: 2, progress: '0/2450' },
+      { id: 'vb-statement', title: '语句表达', activePencils: 1, progress: '0/1120' },
+      { id: 'vb-logic', title: '逻辑填空', activePencils: 0, progress: '0/2320' },
+    ],
+  },
+  {
+    id: 'quant',
+    title: '数量关系',
+    activePencils: 0,
+    progress: '0/3150',
+    hasContinue: false,
+    children: [
+      { id: 'qt-math', title: '数学运算', activePencils: 0, progress: '0/2650' },
+      { id: 'qt-num', title: '数字推理', activePencils: 0, progress: '0/500' },
+    ],
+  },
+  {
+    id: 'reasoning',
+    title: '判断推理',
+    activePencils: 2,
+    progress: '0/6420',
+    hasContinue: true,
+    children: [
+      { id: 'rs-graph', title: '图形推理', activePencils: 2, progress: '0/1580' },
+      { id: 'rs-def', title: '定义判断', activePencils: 0, progress: '0/1620' },
+      { id: 'rs-analogy', title: '类比推理', activePencils: 0, progress: '0/1540' },
+      { id: 'rs-logic', title: '逻辑判断', activePencils: 0, progress: '0/1680' },
+    ],
+  },
+  {
+    id: 'data-analysis',
+    title: '资料分析',
+    activePencils: 1,
+    progress: '0/4180',
+    hasContinue: false,
+    children: [
+      { id: 'da-calc', title: '计算题', activePencils: 1, progress: '0/1980' },
+      { id: 'da-comp', title: '综合分析', activePencils: 0, progress: '0/2200' },
+    ],
   },
 ];
+
+/**
+ * 通用跟手滑动轮播容器（同时支持手机触摸滑动、电脑鼠标左右拖拽、触控板横向滚动与圆点切换）
+ */
+function SwipeCarousel({
+  activeIndex,
+  onChange,
+  children,
+  className = '',
+}: {
+  activeIndex: number;
+  onChange: (newIndex: number) => void;
+  children: React.ReactNode[];
+  className?: string;
+}) {
+  const count = React.Children.count(children);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [dragOffset, setDragOffset] = useState(0);
+  const [isDragging, setIsDragging] = useState(false);
+  const startXRef = useRef(0);
+  const wheelLockRef = useRef(false);
+  const didDragRef = useRef(false);
+
+  const handleStart = (clientX: number) => {
+    setIsDragging(true);
+    startXRef.current = clientX;
+    didDragRef.current = false;
+    setDragOffset(0);
+  };
+
+  const handleMove = (clientX: number) => {
+    if (!isDragging) return;
+    const dx = clientX - startXRef.current;
+    if (Math.abs(dx) > 6) {
+      didDragRef.current = true;
+    }
+    if ((activeIndex === 0 && dx > 0) || (activeIndex === count - 1 && dx < 0)) {
+      setDragOffset(dx * 0.35);
+    } else {
+      setDragOffset(dx);
+    }
+  };
+
+  const handleEnd = () => {
+    if (!isDragging) return;
+    setIsDragging(false);
+    const threshold = 32;
+    if (dragOffset < -threshold && activeIndex < count - 1) {
+      onChange(activeIndex + 1);
+    } else if (dragOffset > threshold && activeIndex > 0) {
+      onChange(activeIndex - 1);
+    }
+    setDragOffset(0);
+  };
+
+  const handleWheel = (e: React.WheelEvent<HTMLDivElement>) => {
+    if (Math.abs(e.deltaX) > Math.abs(e.deltaY) && Math.abs(e.deltaX) > 12) {
+      if (wheelLockRef.current) return;
+      if (e.deltaX > 0 && activeIndex < count - 1) {
+        wheelLockRef.current = true;
+        onChange(activeIndex + 1);
+        setTimeout(() => {
+          wheelLockRef.current = false;
+        }, 350);
+      } else if (e.deltaX < 0 && activeIndex > 0) {
+        wheelLockRef.current = true;
+        onChange(activeIndex - 1);
+        setTimeout(() => {
+          wheelLockRef.current = false;
+        }, 350);
+      }
+    }
+  };
+
+  return (
+    <div
+      ref={containerRef}
+      onMouseDown={(e) => handleStart(e.clientX)}
+      onMouseMove={(e) => handleMove(e.clientX)}
+      onMouseUp={handleEnd}
+      onMouseLeave={handleEnd}
+      onTouchStart={(e) => handleStart(e.touches[0].clientX)}
+      onTouchMove={(e) => handleMove(e.touches[0].clientX)}
+      onTouchEnd={handleEnd}
+      onWheel={handleWheel}
+      onClickCapture={(e) => {
+        if (didDragRef.current) {
+          e.preventDefault();
+          e.stopPropagation();
+          didDragRef.current = false;
+        }
+      }}
+      className={`overflow-hidden select-none cursor-grab active:cursor-grabbing ${className}`}
+    >
+      <div
+        className={`flex w-full h-full ${
+          isDragging ? '' : 'transition-transform duration-300 ease-out'
+        }`}
+        style={{
+          transform: `translate3d(calc(${-activeIndex * 100}% + ${dragOffset}px), 0, 0)`,
+        }}
+      >
+        {React.Children.map(children, (child, idx) => (
+          <div key={idx} className="w-full h-full shrink-0">
+            {child}
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+const SUBJECT_ID_MAP: Record<string, string> = {
+  politics: 'politics',
+  commonsense: 'common',
+  verbal: 'verbal',
+  quant: 'quant',
+  reasoning: 'logic',
+  'data-analysis': 'data',
+};
 
 export const PracticeTab: React.FC<PracticeTabProps> = ({
   examProfile,
   subjects,
+  isMoreMenuOpen,
   onStartQuiz,
   onChangeGoal,
   onOpenSearch,
-  onOpenMoreGrid,
+  onToggleMoreGrid,
   onOpenFeature,
-  onOpenAiTeacher,
 }) => {
-  const [subTab, setSubTab] = useState<'行测' | '申论'>('行测');
-  const [bannerIdx, setBannerIdx] = useState(0);
-  const [expandedSubject, setExpandedSubject] = useState<string | null>(null);
-  const [showAiBubble, setShowAiBubble] = useState(true);
+  const [expandedPrimary, setExpandedPrimary] = useState<Record<string, boolean>>({
+    politics: true,
+  });
+  const [expandedNested, setExpandedNested] = useState<Record<string, boolean>>({
+    philosophy: true,
+  });
 
-  const activeBanner = BANNERS[bannerIdx];
+  // 头图 Banner 当前页索引（共 4 张主题 Banner，每次显示 1 张）
+  const [bannerPage, setBannerPage] = useState(0);
+  // 金刚区当前页索引（共 2 页，每页显示 4 个 3D 图标）
+  const [kingkongPage, setKingkongPage] = useState(0);
+  // 顶部分类栏当前选中项
+  const [activeCategoryTab, setActiveCategoryTab] = useState(0);
+
+  const togglePrimary = (id: string) => {
+    setExpandedPrimary((prev) => ({ ...prev, [id]: !prev[id] }));
+  };
+
+  const toggleNested = (id: string) => {
+    setExpandedNested((prev) => ({ ...prev, [id]: !prev[id] }));
+  };
+
+  const getQuizSubjectId = (primaryId: string) => SUBJECT_ID_MAP[primaryId] || 'politics';
+
+  const getLiveProgress = (primary: PrimaryCategory) => {
+    const mappedId = getQuizSubjectId(primary.id);
+    const liveSubject = subjects.find((s) => s.id === mappedId);
+    if (!liveSubject || liveSubject.doneCount === 0) {
+      return {
+        progress: primary.progress,
+        activePencils: primary.activePencils,
+      };
+    }
+    const total = primary.progress.split('/')[1] || String(liveSubject.totalCount);
+    const boostedPencils = Math.min(5, Math.max(primary.activePencils, Math.ceil(liveSubject.doneCount / 3)));
+    return {
+      progress: `${liveSubject.doneCount}/${total}`,
+      activePencils: boostedPencils,
+    };
+  };
+
+  const handleKingkongClick = (id: string, label: string) => {
+    if (id === 'quick' || id === 'daily') {
+      onStartQuiz('politics');
+      return;
+    }
+    onOpenFeature(label);
+  };
+
+  const topCategories = [
+    `公务员行测-${examProfile.region}`,
+    '公务员申论',
+    '事业单位',
+  ];
 
   return (
-    <div className="relative flex-1 overflow-y-auto bg-gradient-to-b from-[#EDF3FC] via-[#F7F9FC] to-[#F7F9FC] pb-20 no-scrollbar">
-      {/* Top sticky header */}
-      <div className="sticky top-0 z-20 bg-[#EDF3FC]/95 backdrop-blur-md px-4 pt-2 pb-2.5">
-        <div className="flex items-center justify-between gap-2">
-          <div className="flex items-center gap-2 min-w-0">
-            <button
-              type="button"
-              onClick={onChangeGoal}
-              className="flex items-center gap-1 min-w-0 cursor-pointer group"
-            >
-              <span className="text-[17px] font-bold text-slate-900 whitespace-nowrap">
-                公考{examProfile.stage}
-              </span>
-              <span className="text-[12px] text-slate-500 truncate max-w-[82px]">
-                {examProfile.region}·{subTab}
-              </span>
-              <ChevronDown className="w-3.5 h-3.5 text-slate-600 shrink-0 group-hover:text-[#3A7AFE]" />
-            </button>
+    <div className="flex-1 min-h-0 flex flex-col bg-[#F7F8FB]">
+      {/* 2. Top App Header ("练习") — stays anchored at z-50 so 4-rect button morphs in-place into X */}
+      <div
+        className={`relative z-50 shrink-0 px-3.5 pt-1.5 pb-2.5 flex items-center justify-between transition-colors duration-300 ${
+          isMoreMenuOpen ? 'bg-white' : 'bg-[#F7F8FB]'
+        }`}
+      >
+        <h1
+          className={`text-[22px] font-bold tracking-tight leading-none transition-colors duration-300 ${
+            isMoreMenuOpen ? 'text-[#1F242D]' : 'text-[#444444]'
+          }`}
+        >
+          练习
+        </h1>
+        <div className="flex items-center gap-[18px]">
+          {/* Search Icon (smoothly fades out while top dropdown drawer is open) */}
+          <button
+            type="button"
+            aria-label="搜索"
+            onClick={onOpenSearch}
+            tabIndex={isMoreMenuOpen ? -1 : 0}
+            className={`p-0.5 flex items-center justify-center cursor-pointer transition-all duration-250 ${
+              isMoreMenuOpen
+                ? 'opacity-0 scale-75 pointer-events-none'
+                : 'opacity-100 scale-100'
+            }`}
+          >
+            <svg width="20" height="20" viewBox="0 0 22 22" fill="none">
+              <circle
+                cx="9.8"
+                cy="9.8"
+                r="7.4"
+                stroke="#526288"
+                strokeWidth="1.4"
+              />
+              <path
+                d="M15.3 15.3L19.5 19.5"
+                stroke="#526288"
+                strokeWidth="1.4"
+                strokeLinecap="round"
+              />
+            </svg>
+          </button>
 
-            <div className="flex items-center gap-4 ml-2">
-              {(['行测', '申论'] as const).map((t) => (
-                <button
-                  key={t}
-                  type="button"
-                  onClick={() => setSubTab(t)}
-                  className={`relative py-1 text-[15px] transition-colors cursor-pointer whitespace-nowrap ${
-                    subTab === t ? 'font-bold text-slate-900' : 'font-medium text-slate-500'
-                  }`}
-                >
-                  {t}
-                  {subTab === t && (
-                    <span className="absolute left-1/2 -translate-x-1/2 -bottom-0.5 w-4 h-[3px] rounded-full bg-[#3A7AFE]" />
-                  )}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          <div className="flex items-center gap-2 shrink-0">
-            <button
-              type="button"
-              onClick={onOpenSearch}
-              className="w-8 h-8 rounded-full bg-white/80 flex items-center justify-center text-slate-700 hover:text-[#3A7AFE] shadow-2xs cursor-pointer"
-              aria-label="搜索"
+          {/* 4-Rectangle Category Icon <-> X Morphing Button */}
+          <button
+            type="button"
+            aria-label={isMoreMenuOpen ? '关闭菜单' : '分类'}
+            aria-expanded={isMoreMenuOpen}
+            data-guide-target="practice-more-grid"
+            onClick={onToggleMoreGrid}
+            className="p-0.5 flex items-center justify-center cursor-pointer active:scale-90 transition-transform"
+          >
+            <span
+              className={`relative block w-[20px] h-[20px] transition-transform duration-350 ease-[cubic-bezier(0.22,1,0.36,1)] ${
+                isMoreMenuOpen ? 'rotate-90' : 'rotate-0'
+              }`}
+              aria-hidden="true"
             >
-              <Search className="w-4 h-4" />
-            </button>
-            <button
-              type="button"
-              onClick={onOpenMoreGrid}
-              className="w-8 h-8 rounded-full bg-white/80 flex items-center justify-center text-slate-700 hover:text-[#3A7AFE] shadow-2xs cursor-pointer"
-              aria-label="更多功能"
-            >
-              <LayoutGrid className="w-4 h-4" />
-            </button>
-          </div>
+              {/* Top-left rect -> top-left diagonal arm */}
+              <span
+                className={`absolute left-1/2 top-1/2 block transition-all duration-350 ease-[cubic-bezier(0.22,1,0.36,1)] ${
+                  isMoreMenuOpen
+                    ? 'w-[10.5px] h-[1.9px] rounded-full bg-[#2C323B] [transform:translate(-50%,-50%)_translate(-2.6px,-2.6px)_rotate(45deg)]'
+                    : 'w-[7px] h-[7px] rounded-[1.2px] bg-[#5D6B92] [transform:translate(-50%,-50%)_translate(-4.7px,-4.7px)_rotate(0deg)]'
+                }`}
+              />
+              {/* Top-right diamond -> top-right diagonal arm */}
+              <span
+                className={`absolute left-1/2 top-1/2 block transition-all duration-350 ease-[cubic-bezier(0.22,1,0.36,1)] ${
+                  isMoreMenuOpen
+                    ? 'w-[10.5px] h-[1.9px] rounded-full bg-[#2C323B] [transform:translate(-50%,-50%)_translate(2.6px,-2.6px)_rotate(135deg)]'
+                    : 'w-[6.6px] h-[6.6px] rounded-[1.2px] bg-[#3478F6] [transform:translate(-50%,-50%)_translate(4.7px,-4.7px)_rotate(45deg)]'
+                }`}
+              />
+              {/* Bottom-left rect -> bottom-left diagonal arm */}
+              <span
+                className={`absolute left-1/2 top-1/2 block transition-all duration-350 ease-[cubic-bezier(0.22,1,0.36,1)] ${
+                  isMoreMenuOpen
+                    ? 'w-[10.5px] h-[1.9px] rounded-full bg-[#2C323B] [transform:translate(-50%,-50%)_translate(-2.6px,2.6px)_rotate(-45deg)]'
+                    : 'w-[7px] h-[7px] rounded-[1.2px] bg-[#5D6B92] [transform:translate(-50%,-50%)_translate(-4.7px,4.7px)_rotate(0deg)]'
+                }`}
+              />
+              {/* Bottom-right rect -> bottom-right diagonal arm */}
+              <span
+                className={`absolute left-1/2 top-1/2 block transition-all duration-350 ease-[cubic-bezier(0.22,1,0.36,1)] ${
+                  isMoreMenuOpen
+                    ? 'w-[10.5px] h-[1.9px] rounded-full bg-[#2C323B] [transform:translate(-50%,-50%)_translate(2.6px,2.6px)_rotate(45deg)]'
+                    : 'w-[7px] h-[7px] rounded-[1.2px] bg-[#5D6B92] [transform:translate(-50%,-50%)_translate(4.7px,4.7px)_rotate(0deg)]'
+                }`}
+              />
+            </span>
+          </button>
         </div>
       </div>
 
-      {/* Main White Card Container */}
-      <div className="px-3.5 space-y-3">
-        {/* Banner + 5 quick entries + 学习中心 */}
-        <div className="bg-white rounded-2xl p-3 shadow-[0_2px_10px_rgba(15,23,42,0.03)]">
-          {/* Carousel Banner */}
-          <div
-            onClick={() => onOpenFeature(activeBanner.title)}
-            className="relative h-[108px] rounded-xl overflow-hidden cursor-pointer select-none group"
-          >
-            <img
-              src={ESSAY_BANNER_IMAGE}
-              alt={activeBanner.title}
-              referrerPolicy="no-referrer"
-              className="w-full h-full object-cover object-center group-hover:scale-[1.02] transition-transform duration-300"
-            />
-            <div className="absolute inset-0 bg-gradient-to-r from-[#1A6CF0]/85 via-[#2E82FF]/50 to-transparent" />
-            <div className="absolute inset-0 p-3.5 flex flex-col justify-between">
-              <div className="max-w-[68%]">
-                <div className="text-[16px] font-extrabold text-white drop-shadow-xs leading-tight">
-                  {activeBanner.title}
-                </div>
-                <div className="mt-2 inline-flex flex-wrap items-center gap-2 bg-white/95 rounded-full px-2.5 py-1 text-[10px] text-slate-700 font-medium shadow-xs">
-                  {activeBanner.bullets.map((b) => (
-                    <span key={b} className="inline-flex items-center gap-1">
-                      <span className="w-1.5 h-1.5 rounded-full bg-[#3A7AFE]" />
-                      {b}
-                    </span>
-                  ))}
-                </div>
-              </div>
-              <div className="flex items-center justify-between">
-                <button
-                  type="button"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    setBannerIdx((prev) => (prev + 1) % BANNERS.length);
-                  }}
-                  className="text-[10px] text-white/85 bg-black/25 px-2 py-0.5 rounded-full cursor-pointer"
-                >
-                  切换海报 →
-                </button>
-                <span className="text-[10px] text-white bg-black/35 px-2 py-0.5 rounded-full tabular-nums">
-                  {activeBanner.badge}
-                </span>
-              </div>
-            </div>
+      <div className="flex-1 overflow-y-auto bg-[#F7F8FB] pb-[88px] no-scrollbar">
+        {/* 3. Subject Category Bar */}
+        <div className="px-3.5 h-[40px] flex items-center justify-between border-b border-[#ECEDF2] shadow-[0_2px_5px_rgba(0,0,0,0.015)] bg-[#F7F8FB]">
+          <div className="flex items-center gap-[26px] overflow-x-auto no-scrollbar">
+            {topCategories.map((label, idx) => (
+              <button
+                key={label}
+                type="button"
+                onClick={() => {
+                  setActiveCategoryTab(idx);
+                  if (idx > 0) {
+                    onOpenFeature(label);
+                  }
+                }}
+                className={`text-[15px] whitespace-nowrap cursor-pointer transition-colors ${
+                  activeCategoryTab === idx ? 'text-[#444444] font-medium' : 'text-[#8E939E]'
+                }`}
+              >
+                {label}
+              </button>
+            ))}
           </div>
-
-          {/* 5 Quick Function Icons */}
-          <div className="grid grid-cols-5 gap-1 pt-4 pb-3">
-            {[
-              { label: '模考大赛', icon: Trophy, tag: null },
-              { label: '模考奖学金争霸', icon: Award, tag: null },
-              { label: '免费资料', icon: Inbox, tag: null },
-              { label: '会员中心', icon: Crown, tag: '冲刺' },
-              { label: '精品服务', icon: Sparkles, tag: null },
-            ].map((item) => {
-              const Icon = item.icon;
-              return (
-                <button
-                  key={item.label}
-                  type="button"
-                  onClick={() => onOpenFeature(item.label)}
-                  className="relative flex flex-col items-center gap-1.5 py-1 hover:bg-slate-50 rounded-xl transition-colors cursor-pointer"
-                >
-                  {item.tag && (
-                    <span className="absolute -top-0.5 right-1 px-1.5 py-0.2 rounded-full bg-rose-500 text-white text-[9px] font-bold">
-                      {item.tag}
-                    </span>
-                  )}
-                  <div className="w-9 h-9 rounded-xl bg-[#EEF4FF] text-[#2864EB] flex items-center justify-center">
-                    <Icon className="w-5 h-5" />
-                  </div>
-                  <span className="text-[11px] text-slate-700 font-medium text-center leading-tight line-clamp-1">
-                    {item.label}
-                  </span>
-                </button>
-              );
-            })}
-          </div>
-
-          {/* 学习中心 Strip */}
           <button
             type="button"
-            onClick={() => onOpenFeature('学习中心')}
-            className="w-full rounded-xl bg-[#F5F7FA] px-3 py-2.5 flex items-center justify-between text-left hover:bg-[#EEF2F8] transition-colors cursor-pointer"
+            aria-label="添加科目"
+            onClick={onChangeGoal}
+            className="pl-1 flex items-center justify-center shrink-0 cursor-pointer"
           >
-            <div className="flex items-center gap-2 min-w-0">
-              <span className="w-1 h-3.5 rounded-full bg-[#3A7AFE] shrink-0" />
-              <span className="text-[13px] font-bold text-slate-900 whitespace-nowrap">学习中心</span>
-              <ChevronRight className="w-3.5 h-3.5 text-slate-400 shrink-0" />
-              <span className="text-[12px] text-slate-500 truncate border-l border-slate-200 pl-2">
-                开启你的上岸之旅
-              </span>
-            </div>
+            <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+              <path
+                d="M9 1.75V16.25M1.75 9H16.25"
+                stroke="#526288"
+                strokeWidth="1.6"
+                strokeLinecap="round"
+              />
+            </svg>
           </button>
         </div>
 
-        {/* 3 Learning Tools */}
-        <div className="grid grid-cols-3 gap-2">
-          {[
-            { title: '笔试系统班', sub: '系统学习层层递进', icon: BookOpen, color: 'bg-emerald-50 text-emerald-600' },
-            { title: '模考争霸赛', sub: '最高赢99奖学金', icon: FileText, color: 'bg-blue-50 text-[#3A7AFE]' },
-            { title: '组队打卡', sub: '一起刷题瓜分奖励', icon: Users, color: 'bg-amber-50 text-amber-600' },
-          ].map((tool) => {
-            const Icon = tool.icon;
-            return (
-              <button
-                key={tool.title}
-                type="button"
-                onClick={() => onOpenFeature(tool.title)}
-                className="bg-white rounded-xl p-2.5 flex items-center gap-2 text-left shadow-[0_2px_8px_rgba(15,23,42,0.03)] hover:border-[#3A7AFE]/30 border border-transparent transition-all cursor-pointer"
+          {/* 4. Hero Banner（支持左右滑动/拖拽切换，每次显示 1 张，指示圆点居中） */}
+          <div className="px-3.5 pt-3.5">
+            <div className="relative w-full h-[154px] rounded-[16px] overflow-hidden shadow-[0_4px_16px_rgba(38,29,100,0.08)] bg-[#EEF4FF]">
+              <SwipeCarousel
+                activeIndex={bannerPage}
+                onChange={setBannerPage}
+                className="w-full h-full"
               >
-                <div className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 ${tool.color}`}>
-                  <Icon className="w-4 h-4" />
-                </div>
-                <div className="min-w-0">
-                  <div className="text-[12px] font-bold text-slate-900 truncate">{tool.title}</div>
-                  <div className="text-[10px] text-slate-400 truncate mt-0.5">{tool.sub}</div>
-                </div>
-              </button>
-            );
-          })}
-        </div>
+                {[
+                  {
+                    id: 'night-20',
+                    src: '/assets/aistudio/Banner___acdc34f8.png',
+                    alt: '今晚再刷20题，和粉笔伙伴一起高效冲刺',
+                    onClick: () => onOpenFeature('今晚再刷20题'),
+                  },
+                  {
+                    id: 'daily-practice',
+                    src: '/assets/aistudio/image_451c92fc.png',
+                    alt: '每日一练 轻松上岸',
+                    onClick: () => onStartQuiz('politics'),
+                  },
+                  {
+                    id: 'night-10',
+                    src: '/assets/aistudio/image_ede359b5.png',
+                    alt: '今晚再刷10题，把晚间复习变成高效输出',
+                    onClick: () => onStartQuiz('common'),
+                  },
+                  {
+                    id: 'pass-camp',
+                    src: '/assets/aistudio/image_90adb59b.png',
+                    alt: '备考通关营，系统学习精准刷题高效提分',
+                    onClick: () => onOpenFeature('备考通关营'),
+                  },
+                ].map((banner) => (
+                  <button
+                    key={banner.id}
+                    type="button"
+                    onClick={banner.onClick}
+                    aria-label={banner.alt}
+                    className="relative w-full h-full block p-0 border-0 bg-transparent cursor-pointer"
+                  >
+                    <img
+                      src={banner.src}
+                      alt={banner.alt}
+                      referrerPolicy="no-referrer"
+                      draggable={false}
+                      className="w-full h-full object-cover object-center block pointer-events-none select-none"
+                    />
+                  </button>
+                ))}
+              </SwipeCarousel>
 
-        {/* Subject List (行测 vs 申论) */}
-        {subTab === '行测' ? (
-          <div className="bg-white rounded-2xl divide-y divide-slate-100 shadow-[0_2px_10px_rgba(15,23,42,0.03)]">
-            {subjects.map((subject) => {
-              const isOpen = expandedSubject === subject.id;
-              return (
-                <div key={subject.id} className="px-4 py-3.5">
-                  <div className="flex items-center justify-between gap-3">
+              {/* 头图 Banner 居中指示圆点 */}
+              <div className="absolute bottom-[7px] inset-x-0 flex justify-center items-center z-10 pointer-events-none">
+                <div className="flex items-center gap-[6px] px-2 py-[3px] rounded-full bg-black/20 backdrop-blur-[2px] pointer-events-auto">
+                  {[0, 1, 2, 3].map((idx) => (
                     <button
+                      key={idx}
                       type="button"
-                      onClick={() => setExpandedSubject(isOpen ? null : subject.id)}
-                      className="flex items-start gap-3 text-left flex-1 min-w-0 cursor-pointer"
-                    >
-                      <span className="mt-0.5 w-5 h-5 rounded-full bg-[#2E6BF6] text-white flex items-center justify-center shrink-0">
-                        <ChevronDown
-                          className={`w-3.5 h-3.5 transition-transform ${isOpen ? 'rotate-180' : ''}`}
-                        />
-                      </span>
-                      <div className="min-w-0 flex-1">
-                        <div className="text-[15px] font-bold text-slate-900">{subject.name}</div>
-                        <div className="mt-1.5 flex items-center gap-2">
-                          {/* Crescent/progress dots matching screenshot 08 */}
-                          <div className="flex items-center gap-1">
-                            {[0, 1, 2, 3, 4].map((dot) => {
-                              const lit = subject.doneCount > dot * 3;
-                              return (
-                                <span
-                                  key={dot}
-                                  className={`w-3 h-2 rounded-full transition-colors ${
-                                    lit ? 'bg-[#3A7AFE]' : 'bg-slate-200'
-                                  }`}
-                                />
-                              );
-                            })}
+                      aria-label={`切换到第 ${idx + 1} 张 Banner`}
+                      onClick={() => setBannerPage(idx)}
+                      className={`h-[5px] rounded-full transition-all duration-200 cursor-pointer ${
+                        bannerPage === idx
+                          ? 'w-[12px] bg-white'
+                          : 'w-[5px] bg-white/60'
+                      }`}
+                    />
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* 5. 金刚区（每次固定显示 4 个图标，支持左右滑动/拖拽切换，圆点居中） */}
+          <div className="px-3.5 pt-3">
+            <div className="bg-white rounded-[16px] shadow-[0_4px_20px_rgba(30,90,220,0.05)] pt-3.5 pb-2.5 px-2 relative">
+              <SwipeCarousel
+                activeIndex={kingkongPage}
+                onChange={setKingkongPage}
+                className="w-full"
+              >
+                {KINGKONG_PAGES.map((pageItems, pageIdx) => (
+                  <div key={pageIdx} className="w-full grid grid-cols-4">
+                    {pageItems.map(({ id, label, Icon }) => (
+                      <button
+                        key={id}
+                        type="button"
+                        onClick={() => handleKingkongClick(id, label)}
+                        className="flex flex-col items-center select-none cursor-pointer"
+                      >
+                        <Icon />
+                        <span className="mt-1.5 text-[12px] text-[#4A4A4A] whitespace-nowrap">
+                          {label}
+                        </span>
+                      </button>
+                    ))}
+                  </div>
+                ))}
+              </SwipeCarousel>
+
+              {/* 居中滚动指示圆点 */}
+              <div className="flex justify-center items-center gap-[8px] pt-2">
+                {KINGKONG_PAGES.map((_, idx) => (
+                  <button
+                    key={idx}
+                    type="button"
+                    aria-label={`切换到金刚区第 ${idx + 1} 页`}
+                    onClick={() => setKingkongPage(idx)}
+                    className={`h-[5.5px] rounded-full transition-all duration-200 cursor-pointer ${
+                      kingkongPage === idx
+                        ? 'w-[12px] bg-[#3478F6]'
+                        : 'w-[5.5px] bg-[#C5CAD6]'
+                    }`}
+                  />
+                ))}
+              </div>
+            </div>
+          </div>
+
+          {/* 6. 金刚区下方横向可滚动推广插图卡片栏（替换为用户上传的 7 张插图） */}
+          <PromoCardsScroller onSelectPromo={onOpenFeature} />
+
+          {/* 7. 专项题库列表 */}
+          <div className="mt-3 px-3.5 space-y-2.5">
+            {QUESTION_BANK_DATA.map((primary) => {
+              const isExpanded = !!expandedPrimary[primary.id];
+              const hasVisibleChildren = isExpanded && primary.children.length > 0;
+              const quizSubjectId = getQuizSubjectId(primary.id);
+              const liveStats = getLiveProgress(primary);
+
+              return (
+                <div
+                  key={primary.id}
+                  className="bg-white rounded-[16px] shadow-[0_4px_20px_rgba(30,90,220,0.05)] px-3.5 py-1"
+                >
+                  {/* 一级标题行：左侧圆标、标题文字、右侧“继续上次 >”三者严格上下居中对齐 */}
+                  <div
+                    className={`py-3.5 border-b transition-colors duration-300 ${
+                      hasVisibleChildren ? 'border-[#F0F3F8]' : 'border-transparent'
+                    }`}
+                  >
+                    <div className="flex items-center justify-between">
+                      <div
+                        className="flex items-center gap-3 cursor-pointer"
+                        onClick={() => togglePrimary(primary.id)}
+                      >
+                        <button
+                          type="button"
+                          className="w-[28px] h-[28px] rounded-full bg-[#EDF3FE] flex items-center justify-center shrink-0"
+                          aria-label={`展开或收起${primary.title}`}
+                        >
+                          <div className="w-[22px] h-[22px] rounded-full bg-gradient-to-b from-[#2B76FA] to-[#175CE5] flex items-center justify-center shadow-[0_2px_4px_rgba(23,92,229,0.25)]">
+                            <svg
+                              width="11"
+                              height="7"
+                              viewBox="0 0 11 7"
+                              fill="none"
+                              className={`transition-transform duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] ${
+                                isExpanded ? '' : 'rotate-180'
+                              }`}
+                            >
+                              <path
+                                d="M1.5 5.5L5.5 1.5L9.5 5.5"
+                                stroke="white"
+                                strokeWidth="1.9"
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                              />
+                            </svg>
                           </div>
-                          <span className="text-[11.5px] text-slate-400 tabular-nums">
-                            {subject.doneCount}/{subject.totalCount}
-                          </span>
+                        </button>
+
+                        <div className="text-[16.5px] font-bold text-[#141414] leading-none tracking-tight">
+                          {primary.title}
                         </div>
                       </div>
-                    </button>
 
-                    <button
-                      type="button"
-                      onClick={() => onStartQuiz(subject.id)}
-                      className="px-3 py-1.5 rounded-full bg-[#EEF4FF] hover:bg-[#3A7AFE] text-[#3A7AFE] hover:text-white text-[12px] font-medium flex items-center gap-0.5 transition-colors shrink-0 cursor-pointer"
-                    >
-                      <span>刷题</span>
-                      <ChevronRight className="w-3.5 h-3.5" />
-                    </button>
+                      <button
+                        type="button"
+                        onClick={() => onStartQuiz(quizSubjectId)}
+                        className="flex items-center gap-1.5 text-[13.5px] leading-none text-[#0066FF] font-normal shrink-0 cursor-pointer"
+                      >
+                        {primary.hasContinue && <span className="leading-none">继续上次</span>}
+                        <svg width="7" height="12" viewBox="0 0 7 12" fill="none" className="block">
+                          <path
+                            d="M1 1L6 6L1 11"
+                            stroke="#7C8494"
+                            strokeWidth="1.35"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                          />
+                        </svg>
+                      </button>
+                    </div>
+
+                    <PencilProgressRow
+                      activeCount={liveStats.activePencils}
+                      countText={liveStats.progress}
+                      rowKey={primary.id}
+                      className="pl-[40px] mt-1.5"
+                    />
                   </div>
 
-                  {isOpen && (
-                    <div className="mt-3 pl-8 grid grid-cols-2 gap-2">
-                      {subject.subTopics.map((topic) => (
-                        <button
-                          key={topic}
-                          type="button"
-                          onClick={() => onStartQuiz(subject.id)}
-                          className="text-left px-3 py-2 rounded-xl bg-slate-50 hover:bg-[#EEF4FF] text-[12px] text-slate-700 hover:text-[#3A7AFE] transition-colors cursor-pointer"
+                  {/* 二级子节点列表（平滑展开/收起过渡） */}
+                  {primary.children.length > 0 && (
+                    <div
+                      aria-hidden={!isExpanded}
+                      className={`grid transition-[grid-template-rows,opacity] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] ${
+                        isExpanded
+                          ? 'grid-rows-[1fr] opacity-100'
+                          : 'grid-rows-[0fr] opacity-0 pointer-events-none'
+                      }`}
+                    >
+                      <div className="overflow-hidden min-h-0">
+                        <div
+                          className={`transition-transform duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] ${
+                            isExpanded ? 'translate-y-0' : '-translate-y-1.5'
+                          }`}
                         >
-                          {topic}
-                        </button>
-                      ))}
+                          {primary.children.map((secondary, secIdx) => {
+                            const hasNestedCard = !!secondary.nestedCard;
+                            const isNestedOpen =
+                              hasNestedCard && !!expandedNested[secondary.nestedCard!.id];
+
+                            return (
+                              <React.Fragment key={secondary.id}>
+                                <div
+                                  className={`${
+                                    hasNestedCard ? 'pt-3.5 pb-2.5' : 'py-3.5'
+                                  } ${
+                                    secIdx > 0 ? 'border-t border-[#F0F3F8]' : ''
+                                  }`}
+                                >
+                                  <div className="flex items-center justify-between">
+                                    <div className="flex items-center gap-3">
+                                      <div className="w-[24px] h-[24px] rounded-full bg-[#BFC5CE] flex items-center justify-center shrink-0 ml-[2px]">
+                                        <svg width="11" height="7" viewBox="0 0 11 7" fill="none">
+                                          <path
+                                            d="M1.5 1.5L5.5 5.5L9.5 1.5"
+                                            stroke="white"
+                                            strokeWidth="1.9"
+                                            strokeLinecap="round"
+                                            strokeLinejoin="round"
+                                          />
+                                        </svg>
+                                      </div>
+
+                                      <div className="text-[16px] font-bold text-[#141414] leading-none tracking-tight">
+                                        {secondary.title}
+                                      </div>
+                                    </div>
+
+                                    <button
+                                      type="button"
+                                      onClick={() => onStartQuiz(quizSubjectId)}
+                                      className="flex items-center gap-1.5 text-[13.5px] leading-none text-[#0066FF] font-normal shrink-0 cursor-pointer"
+                                    >
+                                      {secondary.hasContinue && <span className="leading-none">继续上次</span>}
+                                      <svg width="7" height="12" viewBox="0 0 7 12" fill="none" className="block">
+                                        <path
+                                          d="M1 1L6 6L1 11"
+                                          stroke="#7C8494"
+                                          strokeWidth="1.35"
+                                          strokeLinecap="round"
+                                          strokeLinejoin="round"
+                                        />
+                                      </svg>
+                                    </button>
+                                  </div>
+
+                                  <PencilProgressRow
+                                    activeCount={secondary.activePencils}
+                                    countText={secondary.progress}
+                                    rowKey={secondary.id}
+                                    className="pl-[40px] mt-1.5"
+                                  />
+                                </div>
+
+                                {/* 三级嵌套浅蓝卡片（如：马克思主义哲学） */}
+                                {hasNestedCard && secondary.nestedCard && (
+                                  <div className="mb-3 bg-[#EFF6FF] rounded-[14px] p-2.5 border border-[#E5F0FF]">
+                                    <div
+                                      className={`px-1 pt-0.5 transition-[padding] duration-300 ${
+                                        isNestedOpen ? 'pb-2' : 'pb-0.5'
+                                      }`}
+                                    >
+                                      <div className="flex items-center justify-between">
+                                        <div
+                                          className="flex items-center gap-2.5 cursor-pointer"
+                                          onClick={() => toggleNested(secondary.nestedCard!.id)}
+                                        >
+                                          <button
+                                            type="button"
+                                            className="w-[26px] h-[26px] rounded-full bg-[#DCEAFE] border border-white/90 shadow-[0_1px_3px_rgba(23,92,229,0.08)] flex items-center justify-center shrink-0"
+                                            aria-label={`展开或收起${secondary.nestedCard.title}`}
+                                          >
+                                            <svg
+                                              width="11"
+                                              height="7"
+                                              viewBox="0 0 11 7"
+                                              fill="none"
+                                              className={`transition-transform duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] ${
+                                                isNestedOpen ? '' : 'rotate-180'
+                                              }`}
+                                            >
+                                              <path
+                                                d="M1.5 5.5L5.5 1.5L9.5 5.5"
+                                                stroke="#0A5CFF"
+                                                strokeWidth="1.9"
+                                                strokeLinecap="round"
+                                                strokeLinejoin="round"
+                                              />
+                                            </svg>
+                                          </button>
+
+                                          <div className="text-[15.5px] font-bold text-[#141414] leading-none tracking-tight">
+                                            {secondary.nestedCard.title}
+                                          </div>
+                                        </div>
+
+                                        <button
+                                          type="button"
+                                          onClick={() => onStartQuiz(quizSubjectId)}
+                                          aria-label={`开始练习${secondary.nestedCard.title}`}
+                                          className="mr-1 p-1 flex items-center justify-center cursor-pointer"
+                                        >
+                                          <svg
+                                            width="7"
+                                            height="12"
+                                            viewBox="0 0 7 12"
+                                            fill="none"
+                                            className="block"
+                                          >
+                                            <path
+                                              d="M1 1L6 6L1 11"
+                                              stroke="#6E7787"
+                                              strokeWidth="1.35"
+                                              strokeLinecap="round"
+                                              strokeLinejoin="round"
+                                            />
+                                          </svg>
+                                        </button>
+                                      </div>
+
+                                      <PencilProgressRow
+                                        activeCount={secondary.nestedCard.activePencils}
+                                        countText={secondary.nestedCard.progress}
+                                        rowKey={secondary.nestedCard.id}
+                                        className="pl-[36px] mt-1.5"
+                                      />
+                                    </div>
+
+                                    {/* 四级叶子考点列表（平滑展开/收起过渡） */}
+                                    <div
+                                      aria-hidden={!isNestedOpen}
+                                      className={`grid transition-[grid-template-rows,opacity] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] ${
+                                        isNestedOpen
+                                          ? 'grid-rows-[1fr] opacity-100'
+                                          : 'grid-rows-[0fr] opacity-0 pointer-events-none'
+                                      }`}
+                                    >
+                                      <div className="overflow-hidden min-h-0">
+                                        <div
+                                          className={`bg-[#F6FAFF] rounded-[11px] px-3.5 py-0.5 shadow-[inset_0_0_0_1px_rgba(255,255,255,0.85)] transition-transform duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] ${
+                                            isNestedOpen ? 'translate-y-0' : '-translate-y-1'
+                                          }`}
+                                        >
+                                          {secondary.nestedCard.leaves.map((leaf, idx) => (
+                                            <div
+                                              key={leaf.id}
+                                              onClick={() => onStartQuiz(quizSubjectId)}
+                                              className={`py-2.5 flex items-center justify-between cursor-pointer ${
+                                                idx !== secondary.nestedCard!.leaves.length - 1
+                                                  ? 'border-b border-[#E8F0FA]'
+                                                  : ''
+                                              }`}
+                                            >
+                                              <span className="text-[14px] font-bold text-[#181818]">
+                                                {leaf.title}
+                                              </span>
+                                              <div className="flex items-center gap-2.5">
+                                                <span className="text-[13px] text-[#595959] tabular-nums">
+                                                  {leaf.progress}
+                                                </span>
+                                                <svg
+                                                  width="6"
+                                                  height="11"
+                                                  viewBox="0 0 7 12"
+                                                  fill="none"
+                                                >
+                                                  <path
+                                                    d="M1 1L6 6L1 11"
+                                                    stroke="#7C8494"
+                                                    strokeWidth="1.35"
+                                                    strokeLinecap="round"
+                                                    strokeLinejoin="round"
+                                                  />
+                                                </svg>
+                                              </div>
+                                            </div>
+                                          ))}
+                                        </div>
+                                      </div>
+                                    </div>
+                                  </div>
+                                )}
+                              </React.Fragment>
+                            );
+                          })}
+                        </div>
+                      </div>
                     </div>
                   )}
                 </div>
               );
             })}
           </div>
-        ) : (
-          <div className="bg-white rounded-2xl p-4 space-y-3 shadow-[0_2px_10px_rgba(15,23,42,0.03)]">
-            <div className="flex items-center justify-between">
-              <h3 className="text-[15px] font-bold text-slate-900">国省考申论 · 专项练习</h3>
-              <span className="text-[12px] text-[#3A7AFE]">含AI智能批改</span>
-            </div>
-            {[
-              { title: '归纳概括题 · 高频真题精选', count: '共 48 题 · 已练 3 题', tag: '基础必练' },
-              { title: '提出对策与贯彻执行（公文写作）', count: '共 36 题 · 已练 1 题', tag: '高频提分' },
-              { title: '申论大作文 · 一类文立意与结构精训', count: '共 24 篇 · AI 批改', tag: '冲刺模版' },
-            ].map((item) => (
-              <button
-                key={item.title}
-                type="button"
-                onClick={() => onOpenFeature(item.title)}
-                className="w-full p-3.5 rounded-xl bg-[#F7F9FC] hover:bg-[#EEF4FF] flex items-center justify-between text-left transition-colors cursor-pointer"
-              >
-                <div>
-                  <div className="text-[14px] font-semibold text-slate-900">{item.title}</div>
-                  <div className="text-[12px] text-slate-400 mt-1">
-                    {item.count} · {item.tag}
-                  </div>
-                </div>
-                <ChevronRight className="w-4 h-4 text-slate-400 shrink-0" />
-              </button>
-            ))}
-          </div>
-        )}
-      </div>
 
-      {/* Floating AI Teacher Bubble matching Screenshot 08 */}
-      {showAiBubble && (
-        <div className="fixed lg:absolute bottom-20 right-4 z-20 flex items-center">
-          <button
-            type="button"
-            onClick={onOpenAiTeacher}
-            className="relative w-12 h-12 rounded-full border-2 border-white shadow-lg overflow-hidden bg-blue-100 cursor-pointer hover:scale-105 transition-transform"
-            aria-label="咨询 AI 老师"
-          >
-            <img
-              src={AI_TEACHER_AVATAR}
-              alt="AI老师"
-              referrerPolicy="no-referrer"
-              className="w-full h-full object-cover"
-            />
-          </button>
-          <button
-            type="button"
-            onClick={() => setShowAiBubble(false)}
-            className="absolute -top-1.5 -right-1 w-4 h-4 rounded-full bg-slate-500/80 text-white flex items-center justify-center cursor-pointer"
-            aria-label="关闭悬浮球"
-          >
-            <X className="w-2.5 h-2.5" />
-          </button>
-        </div>
-      )}
+          {/* 8. "自定义刷题" Pill Button */}
+          <div className="pt-3.5 pb-3 flex justify-center bg-[#F7F8FB]">
+            <button
+              type="button"
+              onClick={() => onStartQuiz('politics')}
+              className="h-[31px] pl-1.5 pr-3.5 rounded-full bg-[#ECEEF4] flex items-center gap-2.5 cursor-pointer"
+            >
+              <div className="w-[21px] h-[21px] rounded-full bg-[#D2D6DF] flex items-center justify-center">
+                <svg width="13" height="13" viewBox="0 0 14 14" fill="none">
+                  <path
+                    d="M7 1.2L12 4.1V9.9L7 12.8L2 9.9V4.1L7 1.2Z"
+                    fill="white"
+                  />
+                  <circle cx="7" cy="7" r="2" fill="#D2D6DF" />
+                </svg>
+              </div>
+              <span className="text-[13px] text-[#666666] tracking-wide">
+                自定义刷题
+              </span>
+              <svg width="5" height="8" viewBox="0 0 5 8" fill="none" className="ml-0.5">
+                <path d="M0.5 0.5L4.5 4L0.5 7.5V0.5Z" fill="#B8BCC8" />
+              </svg>
+            </button>
+          </div>
+      </div>
     </div>
   );
 };

@@ -10,7 +10,7 @@ export type OnboardingScreen =
   | 'goal_type'
   | 'welcome_gift';
 
-export type MainTabId = 'practice' | 'course' | 'jobmatch' | 'discover' | 'me';
+export type MainTabId = 'practice' | 'course' | 'discover' | 'me';
 
 export type ActiveModal =
   | null
@@ -18,8 +18,6 @@ export type ActiveModal =
   | 'more_grid'
   | 'ai_teacher'
   | 'exam_type_modal'
-  | 'job_profile_edit'
-  | 'job_exam_picker'
   | 'course_region_picker'
   | 'feature_preview';
 
@@ -70,6 +68,7 @@ export interface CourseItem {
   id: string;
   category: '公考笔试' | '事业单位' | '就业学院' | '公考面试';
   region: string;
+  badgeTag?: string;
   title: string;
   subtitle: string;
   dateRange: string;
@@ -80,28 +79,18 @@ export interface CourseItem {
   syllabus: string[];
 }
 
-export interface JobAnnouncement {
+export interface FeaturedCourseSlide extends CourseItem {
+  valueNote: string;
+  statusText: string;
+}
+
+export interface FeaturedCourseCollection {
   id: string;
-  title: string;
-  status: '正在报名' | '即将报名' | '报名截止';
-  recruitCount: number;
-  positionCount?: number;
-  region: string;
-  examType: string;
-  category: string;
-  hasBianzhi: boolean;
-  publishDate: string;
-  deadline: string;
-  summary: string;
-  positions: {
-    id: string;
-    dept: string;
-    role: string;
-    quota: number;
-    education: string;
-    major: string;
-    applicants: number;
-  }[];
+  category: CourseItem['category'];
+  badgeTag: string;
+  headerTitle: string;
+  insertIndex: number;
+  slides: FeaturedCourseSlide[];
 }
 
 export interface FeedPost {
@@ -120,15 +109,6 @@ export interface FeedPost {
   liked?: boolean;
   followed?: boolean;
   hasImagePlaceholder?: boolean;
-}
-
-export interface JobPreferences {
-  examTypes: string[];
-  region: string;
-  education: string;
-  major: string;
-  politicalStatus: string;
-  graduateStatus: string;
 }
 
 export interface ScreenDocNode {

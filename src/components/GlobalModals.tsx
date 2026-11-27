@@ -1,18 +1,8 @@
 import React, { useState } from 'react';
-import {
-  Search,
-  X,
-  Send,
-  Sparkles,
-  BookOpen,
-  Trophy,
-  FileText,
-  Briefcase,
-  Target,
-  Clock,
-} from 'lucide-react';
-import { AI_TEACHER_AVATAR, COURSES, INITIAL_SUBJECTS, JOB_ANNOUNCEMENTS } from '../data/fenbiData';
+import { X, Send } from 'lucide-react';
+import { AI_TEACHER_AVATAR } from '../data/fenbiData';
 import { ActiveModal, MainTabId } from '../types/app';
+import { SearchOverlay } from './SearchOverlay';
 
 interface GlobalModalsProps {
   modal: ActiveModal;
@@ -20,7 +10,182 @@ interface GlobalModalsProps {
   onClose: () => void;
   onJumpTab: (tab: MainTabId) => void;
   onStartQuiz: (subjectId: string) => void;
+  onOpenFeature: (title: string) => void;
 }
+
+type PracticeMenuIconId =
+  | 'report'
+  | 'history'
+  | 'wrong'
+  | 'notes'
+  | 'cache'
+  | 'favorite'
+  | 'weekly'
+  | 'one_on_one'
+  | 'system_course';
+
+const PracticeMenuIcon: React.FC<{ id: PracticeMenuIconId }> = ({ id }) => {
+  const sharedProps = {
+    viewBox: '0 0 24 24',
+    fill: 'none',
+    stroke: '#5B687D',
+    strokeWidth: 1.55,
+    strokeLinecap: 'round' as const,
+    strokeLinejoin: 'round' as const,
+    className: 'w-[26px] h-[26px]',
+    'aria-hidden': true,
+  };
+
+  switch (id) {
+    case 'report':
+      return (
+        <svg {...sharedProps}>
+          <rect x="3.5" y="4.5" width="17" height="15" rx="2" />
+          <path d="M3.5 9.2H20.5" />
+          <path d="M7.5 4.5V6.6" />
+          <path d="M12 4.5V6.6" />
+          <path d="M16.5 4.5V6.6" />
+          <path d="M6.8 15.8L10.1 12.9L13.1 14.7L17.2 11.6" />
+        </svg>
+      );
+    case 'history':
+      return (
+        <svg {...sharedProps}>
+          <circle cx="12" cy="12" r="8.5" />
+          <path d="M12 7.4V12L15.1 13.7" />
+        </svg>
+      );
+    case 'wrong':
+      return (
+        <svg {...sharedProps}>
+          <path d="M5.8 4.8H18.2L20.4 13.8V18.3C20.4 19 19.8 19.6 19.1 19.6H4.9C4.2 19.6 3.6 19 3.6 18.3V13.8L5.8 4.8Z" />
+          <path d="M3.6 13.8H8.7C9.1 15.5 10.4 16.6 12 16.6C13.6 16.6 14.9 15.5 15.3 13.8H20.4" />
+          <path d="M10.4 8.2L13.6 11.4" />
+          <path d="M13.6 8.2L10.4 11.4" />
+        </svg>
+      );
+    case 'notes':
+      return (
+        <svg {...sharedProps}>
+          <path d="M6.5 4.5H18.3C19.1 4.5 19.7 5.1 19.7 5.9V15.4L15.6 19.5H6.5C5.7 19.5 5.1 18.9 5.1 18.1V5.9C5.1 5.1 5.7 4.5 6.5 4.5Z" />
+          <path d="M9.2 4.5V19.5" />
+          <path d="M15.6 19.5V15.4H19.7" />
+          <path d="M3.5 8.2H6.5" />
+          <path d="M3.5 12H6.5" />
+          <path d="M3.5 15.8H6.5" />
+        </svg>
+      );
+    case 'cache':
+      return (
+        <svg {...sharedProps}>
+          <path d="M5.8 4.8H18.2L20.4 13.8V18.3C20.4 19 19.8 19.6 19.1 19.6H4.9C4.2 19.6 3.6 19 3.6 18.3V13.8L5.8 4.8Z" />
+          <path d="M3.6 13.8H8.7C9.1 15.5 10.4 16.6 12 16.6C13.6 16.6 14.9 15.5 15.3 13.8H20.4" />
+          <path d="M12 7.3V12.5" />
+          <path d="M9.6 10.3L12 12.7L14.4 10.3" />
+        </svg>
+      );
+    case 'favorite':
+      return (
+        <svg {...sharedProps}>
+          <path d="M12 4.1L14.45 9.06L19.92 9.86L15.96 13.72L16.9 19.17L12 16.6L7.1 19.17L8.04 13.72L4.08 9.86L9.55 9.06L12 4.1Z" />
+        </svg>
+      );
+    case 'weekly':
+      return (
+        <svg {...sharedProps}>
+          <path d="M18.9 13.3A7.4 7.4 0 1 1 10.7 5.1V13.3H18.9Z" />
+          <path d="M13.4 4.1A6.6 6.6 0 0 1 19.9 10.6H13.4V4.1Z" />
+        </svg>
+      );
+    case 'one_on_one':
+      return (
+        <svg {...sharedProps}>
+          <circle cx="9.6" cy="9.4" r="2.9" />
+          <path d="M4.2 19.2C4.2 16.3 6.6 14.4 9.6 14.4C12.6 14.4 15 16.3 15 19.2H4.2Z" />
+          <path d="M13.6 6.2A2.6 2.6 0 1 1 16.6 10.4" />
+          <path d="M14.7 13.2C17.3 13.4 19.4 15 19.8 17.4H16.2" />
+        </svg>
+      );
+    case 'system_course':
+      return (
+        <svg {...sharedProps}>
+          <path d="M8.5 8.5V5.8C8.5 5.1 9.1 4.5 9.8 4.5H19C19.7 4.5 20.3 5.1 20.3 5.8V14.2C20.3 14.9 19.7 15.5 19 15.5H14.2" />
+          <path d="M12.2 8.2H17.4" />
+          <path d="M14 11.3H17.4" />
+          <circle cx="8.8" cy="11.2" r="2.6" />
+          <path d="M4.1 19.3C4.1 16.7 6.2 14.9 8.8 14.9C11.4 14.9 13.5 16.7 13.5 19.3H4.1Z" />
+        </svg>
+      );
+  }
+};
+
+interface PracticeMoreDrawerProps {
+  open: boolean;
+  onClose: () => void;
+  onJumpTab: (tab: MainTabId) => void;
+  onStartQuiz: (subjectId: string) => void;
+  onOpenFeature: (title: string) => void;
+}
+
+export const PracticeMoreDrawer: React.FC<PracticeMoreDrawerProps> = ({
+  open,
+  onClose,
+  onJumpTab,
+  onStartQuiz,
+  onOpenFeature,
+}) => {
+  const tools: { label: string; icon: PracticeMenuIconId; action: () => void }[] = [
+    { label: '用户报告', icon: 'report', action: () => onOpenFeature('用户报告') },
+    { label: '练习历史', icon: 'history', action: () => onStartQuiz('politics') },
+    { label: '我的错题', icon: 'wrong', action: () => onStartQuiz('politics') },
+    { label: '我的笔记', icon: 'notes', action: () => onOpenFeature('我的笔记') },
+    { label: '资料缓存', icon: 'cache', action: () => onOpenFeature('资料缓存') },
+    { label: '我的收藏', icon: 'favorite', action: () => onStartQuiz('common') },
+    { label: '会员周报', icon: 'weekly', action: () => onOpenFeature('会员周报') },
+    { label: '我的1对1', icon: 'one_on_one', action: () => onOpenFeature('我的1对1') },
+    { label: '我的体系课', icon: 'system_course', action: () => onJumpTab('course') },
+  ];
+
+  return (
+    <div
+      aria-hidden={!open}
+      onClick={onClose}
+      className={`absolute inset-0 z-40 flex items-start transition-colors duration-300 ${
+        open ? 'bg-black/48 pointer-events-auto' : 'bg-black/0 pointer-events-none'
+      }`}
+    >
+      <div
+        onClick={(e) => e.stopPropagation()}
+        className={`w-full bg-white rounded-b-[20px] pt-[78px] pb-7 px-3 shadow-[0_12px_32px_rgba(15,23,42,0.14)] transition-all duration-320 ease-[cubic-bezier(0.22,1,0.36,1)] ${
+          open ? 'translate-y-0 opacity-100' : '-translate-y-full opacity-0 pointer-events-none'
+        }`}
+      >
+        {/* 4-Column Tool Grid (9 items: 4 + 4 + 1) */}
+        <div className="grid grid-cols-4 gap-y-6">
+          {tools.map((item) => (
+            <button
+              key={item.label}
+              type="button"
+              tabIndex={open ? 0 : -1}
+              onClick={() => {
+                onClose();
+                item.action();
+              }}
+              className="flex flex-col items-center justify-center text-center cursor-pointer active:opacity-65 transition-opacity"
+            >
+              <span className="w-8 h-8 flex items-center justify-center">
+                <PracticeMenuIcon id={item.icon} />
+              </span>
+              <span className="mt-2 text-[12px] font-normal text-[#596170] leading-tight whitespace-nowrap">
+                {item.label}
+              </span>
+            </button>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+};
 
 export const GlobalModals: React.FC<GlobalModalsProps> = ({
   modal,
@@ -29,7 +194,6 @@ export const GlobalModals: React.FC<GlobalModalsProps> = ({
   onJumpTab,
   onStartQuiz,
 }) => {
-  const [query, setQuery] = useState('');
   const [chatInput, setChatInput] = useState('');
   const [messages, setMessages] = useState<{ role: 'ai' | 'user'; text: string }[]>([
     {
@@ -38,175 +202,11 @@ export const GlobalModals: React.FC<GlobalModalsProps> = ({
     },
   ]);
 
-  if (!modal) return null;
+  if (!modal || modal === 'more_grid') return null;
 
-  // Global Search Page (未采集子页的完整交互实现)
+  // Global Search Page
   if (modal === 'search') {
-    const q = query.trim();
-    const matchedSubjects = INITIAL_SUBJECTS.filter((s) => !q || s.name.includes(q));
-    const matchedCourses = COURSES.filter((c) => !q || c.title.includes(q));
-    const matchedJobs = JOB_ANNOUNCEMENTS.filter((j) => !q || j.title.includes(q));
-
-    return (
-      <div className="absolute inset-0 bg-[#F5F7FA] z-40 flex flex-col animate-fade-scale">
-        <div className="bg-white px-4 py-3 flex items-center gap-2.5 border-b border-slate-100">
-          <div className="flex-1 h-9 rounded-full bg-slate-100 px-3 flex items-center gap-2">
-            <Search className="w-4 h-4 text-slate-400 shrink-0" />
-            <input
-              type="text"
-              autoFocus
-              value={query}
-              onChange={(e) => setQuery(e.target.value)}
-              placeholder="搜索科目、课程、招考公告..."
-              className="flex-1 text-[13.5px] bg-transparent outline-none text-slate-900"
-            />
-          </div>
-          <button
-            type="button"
-            onClick={onClose}
-            className="text-[14px] text-slate-600 font-medium px-1 cursor-pointer"
-          >
-            取消
-          </button>
-        </div>
-
-        <div className="flex-1 overflow-y-auto p-4 space-y-4">
-          {!q && (
-            <div>
-              <div className="text-[12.5px] font-bold text-slate-500 mb-2">热门搜索</div>
-              <div className="flex flex-wrap gap-2">
-                {['政治理论', '申论一类文', '系统班', '北京公务员', '南通辅警'].map((tag) => (
-                  <button
-                    key={tag}
-                    type="button"
-                    onClick={() => setQuery(tag)}
-                    className="px-3 py-1.5 rounded-full bg-white text-[12.5px] text-slate-700 border border-slate-200/70 cursor-pointer"
-                  >
-                    {tag}
-                  </button>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {matchedSubjects.length > 0 && (
-            <div className="space-y-2">
-              <div className="text-[12.5px] font-bold text-slate-500">练习科目</div>
-              {matchedSubjects.map((s) => (
-                <button
-                  key={s.id}
-                  type="button"
-                  onClick={() => {
-                    onClose();
-                    onStartQuiz(s.id);
-                  }}
-                  className="w-full bg-white rounded-xl p-3 flex items-center justify-between text-left cursor-pointer"
-                >
-                  <span className="text-[14px] font-semibold text-slate-900">{s.name}</span>
-                  <span className="text-[12px] text-[#3A7AFE]">进入刷题 →</span>
-                </button>
-              ))}
-            </div>
-          )}
-
-          {matchedCourses.length > 0 && (
-            <div className="space-y-2">
-              <div className="text-[12.5px] font-bold text-slate-500">相关课程</div>
-              {matchedCourses.slice(0, 3).map((c) => (
-                <button
-                  key={c.id}
-                  type="button"
-                  onClick={() => {
-                    onClose();
-                    onJumpTab('course');
-                  }}
-                  className="w-full bg-white rounded-xl p-3 text-left cursor-pointer"
-                >
-                  <div className="text-[13.5px] font-semibold text-slate-900 line-clamp-1">
-                    {c.title}
-                  </div>
-                  <div className="text-[12px] text-[#EA580C] font-semibold mt-1">{c.priceLabel}</div>
-                </button>
-              ))}
-            </div>
-          )}
-
-          {matchedJobs.length > 0 && (
-            <div className="space-y-2">
-              <div className="text-[12.5px] font-bold text-slate-500">招考公告</div>
-              {matchedJobs.slice(0, 2).map((j) => (
-                <button
-                  key={j.id}
-                  type="button"
-                  onClick={() => {
-                    onClose();
-                    onJumpTab('jobmatch');
-                  }}
-                  className="w-full bg-white rounded-xl p-3 text-left cursor-pointer"
-                >
-                  <div className="text-[13.5px] font-semibold text-slate-900 line-clamp-1">
-                    {j.title}
-                  </div>
-                  <div className="text-[11.5px] text-slate-400 mt-1">
-                    {j.region} · {j.status}
-                  </div>
-                </button>
-              ))}
-            </div>
-          )}
-        </div>
-      </div>
-    );
-  }
-
-  // More Grid Menu (我的练习相关功能)
-  if (modal === 'more_grid') {
-    const tools = [
-      { label: '错题本', desc: '高频错题智能重练', icon: BookOpen, action: () => onStartQuiz('politics') },
-      { label: '收藏夹', desc: '已标记的重点好题', icon: Target, action: () => onStartQuiz('common') },
-      { label: '练习历史', desc: '近期做题记录与报告', icon: Clock, action: () => onStartQuiz('politics') },
-      { label: '模考大赛', desc: '全真考场定时排位', icon: Trophy, action: () => onJumpTab('practice') },
-      { label: '申论批改', desc: 'AI智能逐段点评', icon: FileText, action: () => onJumpTab('course') },
-      { label: '选岗匹配', desc: '按专业学历精准筛选', icon: Briefcase, action: () => onJumpTab('jobmatch') },
-    ];
-    return (
-      <div className="absolute inset-0 bg-black/50 z-40 flex items-end">
-        <div className="w-full bg-white rounded-t-3xl p-5 animate-slide-up">
-          <div className="flex items-center justify-between pb-3 border-b border-slate-100">
-            <h3 className="text-[16px] font-bold text-slate-900">我的练习 · 全部工具</h3>
-            <button
-              type="button"
-              onClick={onClose}
-              className="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center cursor-pointer"
-            >
-              <X className="w-4 h-4" />
-            </button>
-          </div>
-          <div className="py-4 grid grid-cols-3 gap-3">
-            {tools.map((item) => {
-              const Icon = item.icon;
-              return (
-                <button
-                  key={item.label}
-                  type="button"
-                  onClick={() => {
-                    onClose();
-                    item.action();
-                  }}
-                  className="p-3 rounded-2xl bg-[#F5F7FA] hover:bg-[#EEF4FF] flex flex-col items-center text-center gap-1.5 cursor-pointer"
-                >
-                  <div className="w-9 h-9 rounded-xl bg-white text-[#3A7AFE] flex items-center justify-center shadow-2xs">
-                    <Icon className="w-4 h-4" />
-                  </div>
-                  <div className="text-[13px] font-semibold text-slate-900">{item.label}</div>
-                  <div className="text-[10.5px] text-slate-400 leading-tight">{item.desc}</div>
-                </button>
-              );
-            })}
-          </div>
-        </div>
-      </div>
-    );
+    return <SearchOverlay onClose={onClose} onStartQuiz={onStartQuiz} />;
   }
 
   // AI Teacher Drawer
@@ -221,13 +221,13 @@ export const GlobalModals: React.FC<GlobalModalsProps> = ({
         { role: 'user', text: userMsg },
         {
           role: 'ai',
-          text: `收到你的问题「${userMsg}」：建议每天保持 1 组政治理论（15题）+ 2 篇资料分析计时练习，并结合「选岗助手」提前核对岗位专业要求。点击下方快捷按钮可直接开始刷题！`,
+          text: `收到你的问题「${userMsg}」：建议每天保持 1 组政治理论（15题）+ 2 篇资料分析计时练习，并结合「系统班」课程查漏补缺。点击下方快捷按钮可直接开始刷题！`,
         },
       ]);
     };
 
     return (
-      <div className="absolute inset-0 bg-black/50 z-40 flex items-end">
+      <div className="absolute inset-0 bg-black/50 z-[65] flex items-end">
         <div className="w-full bg-white rounded-t-3xl h-[78%] flex flex-col animate-slide-up">
           <div className="px-5 py-3.5 border-b border-slate-100 flex items-center justify-between">
             <div className="flex items-center gap-2.5">
@@ -285,11 +285,11 @@ export const GlobalModals: React.FC<GlobalModalsProps> = ({
               type="button"
               onClick={() => {
                 onClose();
-                onJumpTab('jobmatch');
+                onJumpTab('course');
               }}
               className="px-3 py-1 rounded-full bg-[#EEF4FF] text-[#3A7AFE] text-[11.5px] font-medium whitespace-nowrap cursor-pointer"
             >
-              打开选岗助手
+              查看精品课程
             </button>
           </div>
 
@@ -316,15 +316,10 @@ export const GlobalModals: React.FC<GlobalModalsProps> = ({
 
   // Generic Feature Preview Modal
   return (
-    <div className="absolute inset-0 bg-black/50 z-40 flex items-center justify-center px-6">
+    <div className="absolute inset-0 bg-black/50 z-[65] flex items-center justify-center px-6">
       <div className="w-full max-w-[310px] bg-white rounded-3xl p-5 shadow-2xl animate-fade-scale">
         <div className="flex items-center justify-between mb-3">
-          <div className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-xl bg-[#EEF4FF] text-[#3A7AFE] flex items-center justify-center">
-              <Sparkles className="w-4 h-4" />
-            </div>
-            <h3 className="text-[15.5px] font-bold text-slate-900">{featureTitle}</h3>
-          </div>
+          <h3 className="text-[15.5px] font-bold text-slate-900">{featureTitle}</h3>
           <button
             type="button"
             onClick={onClose}
@@ -335,7 +330,7 @@ export const GlobalModals: React.FC<GlobalModalsProps> = ({
         </div>
 
         <p className="text-[13px] text-slate-600 leading-relaxed">
-          「{featureTitle}」属于粉笔教育专项拓展子页。你可以直接体验核心的专项智能刷题或选岗匹配功能。
+          「{featureTitle}」属于粉笔教育专项拓展子页。你可以直接体验核心的专项智能刷题或精品课程学习功能。
         </p>
 
         <div className="mt-4 flex flex-col gap-2">

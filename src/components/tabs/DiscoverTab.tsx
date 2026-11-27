@@ -96,7 +96,7 @@ export const DiscoverTab: React.FC<DiscoverTabProps> = ({
   };
 
   return (
-    <div className="relative flex-1 overflow-y-auto bg-[#F5F7FA] pb-20 no-scrollbar">
+    <div className="relative flex-1 overflow-y-auto bg-[#F5F7FA] pb-24 no-scrollbar">
       {/* Sticky Header */}
       <div className="sticky top-0 z-20 bg-white/95 backdrop-blur-md border-b border-slate-100">
         <div className="px-4 pt-2.5 pb-2 flex items-center justify-between">
@@ -269,7 +269,7 @@ export const DiscoverTab: React.FC<DiscoverTabProps> = ({
       <button
         type="button"
         onClick={() => setShowComposer(true)}
-        className="fixed lg:absolute bottom-20 right-4 z-20 w-12 h-12 rounded-full bg-gradient-to-br from-[#4285FF] to-[#2663EB] text-white shadow-lg shadow-[#3A7AFE]/35 flex items-center justify-center hover:scale-105 active:scale-95 transition-transform cursor-pointer"
+        className="fixed lg:absolute bottom-[88px] right-4 z-20 w-12 h-12 rounded-full bg-gradient-to-br from-[#4285FF] to-[#2663EB] text-white shadow-lg shadow-[#3A7AFE]/35 flex items-center justify-center hover:scale-105 active:scale-95 transition-transform cursor-pointer"
         aria-label="发布动态"
       >
         <PenSquare className="w-5 h-5" />

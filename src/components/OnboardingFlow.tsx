@@ -5,7 +5,6 @@ import {
   Check,
   ShieldCheck,
   Gift,
-  Sparkles,
   X,
   ArrowRight,
   Lock,
@@ -59,7 +58,7 @@ export const OnboardingFlow: React.FC<OnboardingFlowProps> = ({
   const MAX_TRACK_X = 236;
 
   // Welcome gifts
-  const [selectedGifts, setSelectedGifts] = useState<string[]>(['pack', 'vip', 'job']);
+  const [selectedGifts, setSelectedGifts] = useState<string[]>(['pack', 'vip', 'plan']);
 
   const handleSliderMove = (clientX: number) => {
     if (!isDragging || captchaPassed || !trackRef.current) return;
@@ -125,7 +124,7 @@ export const OnboardingFlow: React.FC<OnboardingFlowProps> = ({
         {/* Dimmed splash background with Fenbi logo at bottom */}
         <div className="flex-1 flex flex-col items-center justify-end pb-10 px-6">
           <div className="flex items-center gap-2 opacity-35 mb-3">
-            <FenbiLogo className="w-7 h-7 grayscale" />
+            <FenbiLogo className="w-9 h-6 grayscale" />
             <span className="text-lg font-bold tracking-wide text-slate-400">粉笔</span>
           </div>
           <p className="text-[11px] text-slate-500">© 2012-2026 fenbi. All Rights Reserved.</p>
@@ -183,7 +182,7 @@ export const OnboardingFlow: React.FC<OnboardingFlowProps> = ({
                   setDeclinedNotice(false);
                   onNavigate('login');
                 }}
-                className="w-full h-11 rounded-full bg-gradient-to-r from-[#4285FF] to-[#2F6BFF] text-white text-[15px] font-semibold shadow-md shadow-[#3A7AFE]/30 active:scale-[0.98] transition-transform cursor-pointer"
+                className="w-full h-11 rounded-full bg-gradient-to-r from-[#4285FF] to-[#2F6BFF] text-white text-[15px] font-semibold shadow-[0_6px_16px_rgba(58,122,254,0.18)] active:scale-[0.98] transition-transform cursor-pointer"
               >
                 同意并继续
               </button>
@@ -219,7 +218,7 @@ export const OnboardingFlow: React.FC<OnboardingFlowProps> = ({
                 </button>
               </div>
               <div className="py-3 overflow-y-auto text-[12.5px] leading-relaxed text-slate-600 space-y-2.5">
-                <p>1. 我们仅收集提供刷题练习、课程学习、选岗匹配所必需的账号与学习记录信息。</p>
+                <p>1. 我们仅收集提供刷题练习、课程学习与社区交流所必需的账号与学习记录信息。</p>
                 <p>2. 您的做题正确率、笔记与收藏仅用于个性化智能练题推荐与备考统计。</p>
                 <p>3. 您可以随时在「我 - 设置」中管理授权权限或注销账号。</p>
               </div>
@@ -262,8 +261,8 @@ export const OnboardingFlow: React.FC<OnboardingFlowProps> = ({
         {/* Center Logo */}
         <div className="flex-1 flex flex-col items-center justify-center px-8 pb-12">
           <div className="mb-20 flex flex-col items-center">
-            <div className="drop-shadow-[0_12px_20px_rgba(58,122,254,0.22)]">
-              <FenbiLogo className="w-16 h-16" />
+            <div className="drop-shadow-[0_10px_18px_rgba(30,122,254,0.16)]">
+              <FenbiLogo className="w-24 h-16" />
             </div>
           </div>
 
@@ -276,7 +275,7 @@ export const OnboardingFlow: React.FC<OnboardingFlowProps> = ({
               }
               onNavigate('sms_login');
             }}
-            className="w-full h-12 rounded-full bg-gradient-to-r from-[#4285FF] to-[#2F6BFF] text-white text-[15px] font-semibold shadow-lg shadow-[#3A7AFE]/25 active:scale-[0.98] transition-transform cursor-pointer"
+            className="w-full h-12 rounded-full bg-gradient-to-r from-[#4285FF] to-[#2F6BFF] text-white text-[15px] font-semibold shadow-[0_6px_18px_rgba(58,122,254,0.16)] active:scale-[0.98] transition-transform cursor-pointer"
           >
             短信验证码登录
           </button>
@@ -576,28 +575,47 @@ export const OnboardingFlow: React.FC<OnboardingFlowProps> = ({
     );
   }
 
+  const renderGuideHeader = (prevScreen: OnboardingScreen, prevLabel: string) => (
+    <div className="px-4 pt-2 flex items-center justify-between shrink-0">
+      <button
+        type="button"
+        onClick={() => onNavigate(prevScreen)}
+        aria-label={`返回${prevLabel}`}
+        className="inline-flex items-center gap-0.5 h-8 px-1.5 -ml-1 rounded-full text-slate-600 hover:text-slate-900 hover:bg-slate-200/50 transition-colors cursor-pointer"
+      >
+        <ChevronLeft className="w-5 h-5" />
+        <span className="text-[14px] font-medium">{prevLabel}</span>
+      </button>
+      <button
+        type="button"
+        onClick={() => onFinishOnboarding([])}
+        className="py-1 px-1.5 text-[14px] font-medium text-slate-400 hover:text-slate-600 active:scale-[0.98] transition-all cursor-pointer"
+      >
+        跳过
+      </button>
+    </div>
+  );
+
+  const renderGuideFooter = () => (
+    <div className="py-4 text-center shrink-0">
+      <p className="text-[12px] text-slate-400">该信息可随时在首页更改</p>
+    </div>
+  );
+
   // Screen 03: 目标考试选择页
   if (screen === 'goal_exam') {
     return (
       <div className="flex flex-col h-full bg-gradient-to-b from-[#F4F7FC] via-[#F7F9FD] to-white">
         <StatusBar time="2:12" />
-        <div className="px-5 pt-2 flex items-center justify-between">
-          <button
-            type="button"
-            onClick={() => onFinishOnboarding([])}
-            className="text-[14px] text-slate-400 hover:text-slate-600 py-1 cursor-pointer"
-          >
-            跳过
-          </button>
-        </div>
+        {renderGuideHeader('login', '登录')}
 
-        <div className="text-center px-6 pt-3 pb-5">
+        <div className="text-center px-6 pt-2 pb-4 shrink-0">
           <h1 className="text-[21px] font-bold text-slate-800 tracking-tight">你的目标考试是？</h1>
           <p className="text-[12px] text-slate-400 mt-1.5">填写完成将为你定制你的个性化题库</p>
         </div>
 
-        <div className="flex-1 overflow-y-auto px-4 pb-4 no-scrollbar">
-          <div className="grid grid-cols-3 gap-2.5">
+        <div className="flex-1 overflow-y-auto px-4 flex flex-col no-scrollbar">
+          <div className="my-auto py-2 grid grid-cols-3 gap-2.5 w-full">
             {EXAM_CATEGORIES.map((exam) => {
               const selected = examProfile.examName === exam;
               return (
@@ -608,23 +626,21 @@ export const OnboardingFlow: React.FC<OnboardingFlowProps> = ({
                     onUpdateProfile({ examName: exam });
                     onNavigate('goal_stage');
                   }}
-                  className={`h-10 px-3 rounded-full bg-white flex items-center justify-between text-[12.5px] font-medium shadow-[0_2px_8px_rgba(15,23,42,0.04)] border transition-all active:scale-[0.97] cursor-pointer ${
+                  className={`relative h-10 px-5 rounded-full bg-white flex items-center justify-center text-[12.5px] font-medium shadow-[0_2px_8px_rgba(15,23,42,0.025)] border transition-all active:scale-[0.97] cursor-pointer ${
                     selected
                       ? 'border-[#3A7AFE] text-[#3A7AFE]'
                       : 'border-slate-100 text-slate-700 hover:border-[#3A7AFE]/40'
                   }`}
                 >
-                  <span className="truncate">{exam}</span>
-                  <ChevronRight className="w-3.5 h-3.5 text-slate-400 shrink-0 ml-0.5" />
+                  <span className="truncate text-center">{exam}</span>
+                  <ChevronRight className="w-3.5 h-3.5 text-slate-400 absolute right-2" />
                 </button>
               );
             })}
           </div>
         </div>
 
-        <div className="py-4 text-center text-[12px] text-slate-400 shrink-0">
-          该信息可随时在首页更改
-        </div>
+        {renderGuideFooter()}
       </div>
     );
   }
@@ -634,64 +650,49 @@ export const OnboardingFlow: React.FC<OnboardingFlowProps> = ({
     return (
       <div className="flex flex-col h-full bg-gradient-to-b from-[#F4F7FC] via-[#F7F9FD] to-white">
         <StatusBar time="2:13" />
-        <div className="px-5 pt-2 flex items-center justify-between">
-          <button
-            type="button"
-            onClick={() => onFinishOnboarding([])}
-            className="text-[14px] text-slate-400 hover:text-slate-600 py-1 cursor-pointer"
-          >
-            跳过
-          </button>
-        </div>
+        {renderGuideHeader('goal_exam', '目标考试')}
 
-        <div className="text-center px-6 pt-3 pb-6">
+        <div className="text-center px-6 pt-2 pb-4 shrink-0">
           <h1 className="text-[21px] font-bold text-slate-800 tracking-tight">你的目标考试是？</h1>
-          <p className="text-[12px] text-slate-400 mt-1.5">填写完成将为你定制你的个性化题库</p>
-        </div>
-
-        <div className="px-6 flex-1">
-          <button
-            type="button"
-            onClick={() => onNavigate('goal_exam')}
-            className="inline-flex items-center gap-1 px-3.5 py-1.5 rounded-full bg-white text-[#3A7AFE] text-[13px] font-medium shadow-sm border border-slate-100 mb-6 cursor-pointer"
-          >
-            <ChevronLeft className="w-3.5 h-3.5" />
-            <span>{examProfile.examName}</span>
-          </button>
-
-          <div className="space-y-4 max-w-[270px] mx-auto mt-2">
-            <button
-              type="button"
-              onClick={() => {
-                onUpdateProfile({ stage: '笔试' });
-                onNavigate('goal_region');
-              }}
-              className="w-full h-13 px-6 rounded-full bg-white flex items-center justify-between text-[15px] font-semibold text-slate-800 shadow-[0_4px_14px_rgba(15,23,42,0.05)] border border-slate-100 hover:border-[#3A7AFE]/50 active:scale-[0.98] transition-all cursor-pointer"
-            >
-              <span className="flex-1 text-center pl-4">笔试</span>
-              <ChevronRight className="w-4 h-4 text-slate-400" />
-            </button>
-
-            <button
-              type="button"
-              onClick={() => {
-                onUpdateProfile({ stage: '面试' });
-                onFinishOnboarding([], 'course');
-              }}
-              className="w-full h-13 px-6 rounded-full bg-white flex items-center justify-between text-[15px] font-semibold text-slate-800 shadow-[0_4px_14px_rgba(15,23,42,0.05)] border border-slate-100 hover:border-[#3A7AFE]/50 active:scale-[0.98] transition-all cursor-pointer"
-            >
-              <span className="flex-1 text-center pl-4">面试</span>
-              <ChevronRight className="w-4 h-4 text-slate-400" />
-            </button>
-          </div>
-          <p className="text-center text-[11px] text-slate-400 mt-5">
-            选择「笔试」定制地区与考试类别；选择「面试」直达面试课程
+          <p className="text-[12px] text-slate-400 mt-1.5">
+            已选「{examProfile.examName}」，请选择备考阶段
           </p>
         </div>
 
-        <div className="py-4 text-center text-[12px] text-slate-400 shrink-0">
-          该信息可随时在首页更改
+        <div className="flex-1 overflow-y-auto px-6 flex flex-col no-scrollbar">
+          <div className="my-auto py-2 w-full">
+            <div className="space-y-4 max-w-[270px] mx-auto">
+              <button
+                type="button"
+                onClick={() => {
+                  onUpdateProfile({ stage: '笔试' });
+                  onNavigate('goal_region');
+                }}
+                className="w-full h-13 px-6 rounded-full bg-white flex items-center justify-between text-[15px] font-semibold text-slate-800 shadow-[0_4px_14px_rgba(15,23,42,0.025)] border border-slate-100 hover:border-[#3A7AFE]/50 active:scale-[0.98] transition-all cursor-pointer"
+              >
+                <span className="flex-1 text-center pl-4">笔试</span>
+                <ChevronRight className="w-4 h-4 text-slate-400" />
+              </button>
+
+              <button
+                type="button"
+                onClick={() => {
+                  onUpdateProfile({ stage: '面试' });
+                  onFinishOnboarding([], 'course');
+                }}
+                className="w-full h-13 px-6 rounded-full bg-white flex items-center justify-between text-[15px] font-semibold text-slate-800 shadow-[0_4px_14px_rgba(15,23,42,0.025)] border border-slate-100 hover:border-[#3A7AFE]/50 active:scale-[0.98] transition-all cursor-pointer"
+              >
+                <span className="flex-1 text-center pl-4">面试</span>
+                <ChevronRight className="w-4 h-4 text-slate-400" />
+              </button>
+            </div>
+            <p className="text-center text-[11px] text-slate-400 mt-5">
+              选择「笔试」定制地区与考试类别；选择「面试」直达面试课程
+            </p>
+          </div>
         </div>
+
+        {renderGuideFooter()}
       </div>
     );
   }
@@ -701,34 +702,17 @@ export const OnboardingFlow: React.FC<OnboardingFlowProps> = ({
     return (
       <div className="flex flex-col h-full bg-gradient-to-b from-[#F4F7FC] via-[#F7F9FD] to-white">
         <StatusBar time="2:13" />
-        <div className="px-5 pt-2 flex items-center justify-between">
-          <button
-            type="button"
-            onClick={() => onFinishOnboarding([])}
-            className="text-[14px] text-slate-400 hover:text-slate-600 py-1 cursor-pointer"
-          >
-            跳过
-          </button>
-        </div>
+        {renderGuideHeader('goal_stage', '备考阶段')}
 
-        <div className="text-center px-6 pt-2 pb-4">
+        <div className="text-center px-6 pt-2 pb-4 shrink-0">
           <h1 className="text-[21px] font-bold text-slate-800 tracking-tight">你的目标考试是？</h1>
-          <p className="text-[12px] text-slate-400 mt-1.5">填写完成将为你定制你的个性化题库</p>
+          <p className="text-[12px] text-slate-400 mt-1.5">
+            已选「{examProfile.examName} · {examProfile.stage}」，请选择报考地区
+          </p>
         </div>
 
-        <div className="px-4 mb-3">
-          <button
-            type="button"
-            onClick={() => onNavigate('goal_stage')}
-            className="inline-flex items-center gap-1 px-3.5 py-1.5 rounded-full bg-white text-[#3A7AFE] text-[13px] font-medium shadow-sm border border-slate-100 cursor-pointer"
-          >
-            <ChevronLeft className="w-3.5 h-3.5" />
-            <span>{examProfile.stage}</span>
-          </button>
-        </div>
-
-        <div className="flex-1 overflow-y-auto px-4 pb-4 no-scrollbar">
-          <div className="grid grid-cols-3 gap-2.5">
+        <div className="flex-1 overflow-y-auto px-4 flex flex-col no-scrollbar">
+          <div className="my-auto py-2 grid grid-cols-3 gap-2.5 w-full">
             {REGIONS.map((region) => (
               <button
                 key={region}
@@ -737,18 +721,16 @@ export const OnboardingFlow: React.FC<OnboardingFlowProps> = ({
                   onUpdateProfile({ region });
                   onNavigate('goal_type');
                 }}
-                className="h-10 px-3.5 rounded-full bg-white flex items-center justify-between text-[13px] font-medium text-slate-700 shadow-[0_2px_8px_rgba(15,23,42,0.04)] border border-slate-100 hover:border-[#3A7AFE]/50 active:scale-[0.97] transition-all cursor-pointer"
+                className="relative h-10 px-5 rounded-full bg-white flex items-center justify-center text-[13px] font-medium text-slate-700 shadow-[0_2px_8px_rgba(15,23,42,0.025)] border border-slate-100 hover:border-[#3A7AFE]/50 active:scale-[0.97] transition-all cursor-pointer"
               >
-                <span className="truncate">{region}</span>
-                <ChevronRight className="w-3.5 h-3.5 text-slate-400 shrink-0" />
+                <span className="truncate text-center">{region}</span>
+                <ChevronRight className="w-3.5 h-3.5 text-slate-400 absolute right-2" />
               </button>
             ))}
           </div>
         </div>
 
-        <div className="py-4 text-center text-[12px] text-slate-400 shrink-0">
-          该信息可随时在首页更改
-        </div>
+        {renderGuideFooter()}
       </div>
     );
   }
@@ -758,32 +740,17 @@ export const OnboardingFlow: React.FC<OnboardingFlowProps> = ({
     return (
       <div className="flex flex-col h-full bg-gradient-to-b from-[#F4F7FC] via-[#F7F9FD] to-white">
         <StatusBar time="2:14" />
-        <div className="px-5 pt-2 flex items-center justify-between">
-          <button
-            type="button"
-            onClick={() => onFinishOnboarding([])}
-            className="text-[14px] text-slate-400 hover:text-slate-600 py-1 cursor-pointer"
-          >
-            跳过
-          </button>
-        </div>
+        {renderGuideHeader('goal_region', '报考地区')}
 
-        <div className="text-center px-6 pt-3 pb-6">
+        <div className="text-center px-6 pt-2 pb-4 shrink-0">
           <h1 className="text-[21px] font-bold text-slate-800 tracking-tight">你的目标考试是？</h1>
-          <p className="text-[12px] text-slate-400 mt-1.5">填写完成将为你定制你的个性化题库</p>
+          <p className="text-[12px] text-slate-400 mt-1.5">
+            已选「{examProfile.region}」，请选择考试类别
+          </p>
         </div>
 
-        <div className="px-6 flex-1">
-          <button
-            type="button"
-            onClick={() => onNavigate('goal_region')}
-            className="inline-flex items-center gap-1 px-3.5 py-1.5 rounded-full bg-white text-[#3A7AFE] text-[13px] font-medium shadow-sm border border-slate-100 mb-6 cursor-pointer"
-          >
-            <ChevronLeft className="w-3.5 h-3.5" />
-            <span>{examProfile.region}</span>
-          </button>
-
-          <div className="space-y-3.5 max-w-[270px] mx-auto">
+        <div className="flex-1 overflow-y-auto px-6 flex flex-col no-scrollbar">
+          <div className="my-auto py-2 space-y-3.5 max-w-[270px] w-full mx-auto">
             {GUOKAO_TYPES.map((item) => (
               <button
                 key={item.id}
@@ -792,7 +759,7 @@ export const OnboardingFlow: React.FC<OnboardingFlowProps> = ({
                   onUpdateProfile({ categoryType: item.label });
                   onNavigate('welcome_gift');
                 }}
-                className="w-full h-13 px-6 rounded-full bg-white flex items-center justify-center text-[15px] font-semibold text-slate-800 shadow-[0_4px_14px_rgba(15,23,42,0.05)] border border-slate-100 hover:border-[#3A7AFE] hover:text-[#3A7AFE] active:scale-[0.98] transition-all cursor-pointer"
+                className="w-full h-13 px-6 rounded-full bg-white flex items-center justify-center text-[15px] font-semibold text-slate-800 shadow-[0_4px_14px_rgba(15,23,42,0.025)] border border-slate-100 hover:border-[#3A7AFE] hover:text-[#3A7AFE] active:scale-[0.98] transition-all cursor-pointer"
               >
                 {item.label}
               </button>
@@ -800,9 +767,7 @@ export const OnboardingFlow: React.FC<OnboardingFlowProps> = ({
           </div>
         </div>
 
-        <div className="py-4 text-center text-[12px] text-slate-400 shrink-0">
-          该信息可随时在首页更改
-        </div>
+        {renderGuideFooter()}
       </div>
     );
   }
@@ -811,25 +776,9 @@ export const OnboardingFlow: React.FC<OnboardingFlowProps> = ({
   return (
     <div className="relative flex flex-col h-full bg-gradient-to-b from-[#EDF4FF] via-[#F7FAFF] to-white">
       <StatusBar time="2:15" />
+      {renderGuideHeader('goal_type', '考试类别')}
 
-      <div className="px-5 pt-3 flex items-center justify-between">
-        <button
-          type="button"
-          onClick={() => onNavigate('goal_type')}
-          className="w-8 h-8 rounded-full bg-white/80 flex items-center justify-center text-slate-600 shadow-xs cursor-pointer"
-        >
-          <ChevronLeft className="w-4 h-4" />
-        </button>
-        <button
-          type="button"
-          onClick={() => onFinishOnboarding([])}
-          className="text-[13px] text-slate-400 hover:text-slate-600 py-1 px-2 cursor-pointer"
-        >
-          放弃福利
-        </button>
-      </div>
-
-      <div className="px-6 pt-4 pb-4 text-center">
+      <div className="px-6 pt-3 pb-4 text-center shrink-0">
         <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#3A7AFE]/10 text-[#3A7AFE] text-[12px] font-medium mb-2.5">
           <Gift className="w-3.5 h-3.5" />
           <span>已定制：{examProfile.region} · {examProfile.categoryType}</span>
@@ -838,52 +787,53 @@ export const OnboardingFlow: React.FC<OnboardingFlowProps> = ({
         <p className="text-[12.5px] text-slate-500 mt-1">为你匹配上岸起步权益，可多选免费领取</p>
       </div>
 
-      <div className="flex-1 px-5 space-y-3 overflow-y-auto no-scrollbar">
-        {WELCOME_GIFTS.map((gift) => {
-          const checked = selectedGifts.includes(gift.id);
-          return (
-            <button
-              key={gift.id}
-              type="button"
-              onClick={() =>
-                setSelectedGifts((prev) =>
-                  prev.includes(gift.id) ? prev.filter((i) => i !== gift.id) : [...prev, gift.id]
-                )
-              }
-              className={`w-full text-left p-4 rounded-2xl border transition-all flex items-center justify-between gap-3 cursor-pointer ${
-                checked
-                  ? 'bg-white border-[#3A7AFE] shadow-[0_6px_18px_rgba(58,122,254,0.12)]'
-                  : 'bg-white/80 border-slate-100 text-slate-500'
-              }`}
-            >
-              <div className="min-w-0">
-                <div className="flex items-center gap-2">
-                  <span className="text-[15px] font-bold text-slate-900">{gift.title}</span>
-                  <span className="text-[11px] font-medium text-[#3A7AFE] bg-[#EEF4FF] px-1.5 py-0.5 rounded">
-                    {gift.tag}
-                  </span>
-                </div>
-                <p className="text-[12px] text-slate-500 mt-1">{gift.subtitle}</p>
-              </div>
-              <div
-                className={`w-6 h-6 rounded-full flex items-center justify-center shrink-0 transition-colors ${
-                  checked ? 'bg-[#3A7AFE] text-white' : 'border border-slate-300 bg-slate-50'
+      <div className="flex-1 px-5 overflow-y-auto flex flex-col no-scrollbar">
+        <div className="my-auto py-2 space-y-3 w-full">
+          {WELCOME_GIFTS.map((gift) => {
+            const checked = selectedGifts.includes(gift.id);
+            return (
+              <button
+                key={gift.id}
+                type="button"
+                onClick={() =>
+                  setSelectedGifts((prev) =>
+                    prev.includes(gift.id) ? prev.filter((i) => i !== gift.id) : [...prev, gift.id]
+                  )
+                }
+                className={`w-full text-left p-4 rounded-2xl border transition-all flex items-center justify-between gap-3 cursor-pointer ${
+                  checked
+                    ? 'bg-white border-[#3A7AFE] shadow-[0_4px_14px_rgba(58,122,254,0.06)]'
+                    : 'bg-white/80 border-slate-100 text-slate-500'
                 }`}
               >
-                {checked && <Check className="w-3.5 h-3.5 stroke-[3]" />}
-              </div>
-            </button>
-          );
-        })}
+                <div className="min-w-0">
+                  <div className="flex items-center gap-2">
+                    <span className="text-[15px] font-bold text-slate-900">{gift.title}</span>
+                    <span className="text-[11px] font-medium text-[#3A7AFE] bg-[#EEF4FF] px-1.5 py-0.5 rounded">
+                      {gift.tag}
+                    </span>
+                  </div>
+                  <p className="text-[12px] text-slate-500 mt-1">{gift.subtitle}</p>
+                </div>
+                <div
+                  className={`w-6 h-6 rounded-full flex items-center justify-center shrink-0 transition-colors ${
+                    checked ? 'bg-[#3A7AFE] text-white' : 'border border-slate-300 bg-slate-50'
+                  }`}
+                >
+                  {checked && <Check className="w-3.5 h-3.5 stroke-[3]" />}
+                </div>
+              </button>
+            );
+          })}
+        </div>
       </div>
 
-      <div className="px-5 pt-3 pb-7 space-y-2.5 bg-gradient-to-t from-white via-white to-transparent">
+      <div className="px-5 pt-3 pb-4 flex flex-col items-center gap-2.5 shrink-0 bg-gradient-to-t from-white via-white to-transparent">
         <button
           type="button"
           onClick={() => onFinishOnboarding(WELCOME_GIFTS.map((g) => g.id))}
-          className="w-full h-12 rounded-full bg-gradient-to-r from-[#4285FF] to-[#2F6BFF] text-white text-[15px] font-semibold shadow-lg shadow-[#3A7AFE]/25 flex items-center justify-center gap-1.5 active:scale-[0.98] transition-transform cursor-pointer"
+          className="w-full h-12 rounded-full bg-gradient-to-r from-[#4285FF] to-[#2F6BFF] text-white text-[15px] font-semibold shadow-[0_6px_18px_rgba(58,122,254,0.16)] flex items-center justify-center active:scale-[0.98] transition-transform cursor-pointer"
         >
-          <Sparkles className="w-4 h-4" />
           <span>全部都要 · 立即开启备考</span>
         </button>
         {selectedGifts.length > 0 && selectedGifts.length < WELCOME_GIFTS.length && (
@@ -895,6 +845,9 @@ export const OnboardingFlow: React.FC<OnboardingFlowProps> = ({
             仅领取已选 {selectedGifts.length} 项
           </button>
         )}
+        <p className="text-center text-[12px] text-slate-400 pt-1">
+          该信息可随时在首页更改
+        </p>
       </div>
     </div>
   );

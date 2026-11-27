@@ -1,7 +1,7 @@
 import {
   CourseItem,
+  FeaturedCourseCollection,
   FeedPost,
-  JobAnnouncement,
   QuizQuestion,
   ScreenDocNode,
   SubjectItem,
@@ -22,18 +22,20 @@ export const EXAM_CATEGORIES: string[] = [
   '专升本', '遴选', '选调',
 ];
 
-export const REGIONS: string[] = [
-  '国考', '江苏', '浙江',
-  '江西', '广东', '山东',
-  '黑龙江', '四川', '云南',
-  '安徽', '河南', '河北',
-  '湖南', '湖北', '陕西',
-  '甘肃', '辽宁', '吉林',
-  '山西', '内蒙古', '贵州',
-  '广西', '新疆', '青海',
-  '海南', '福建', '宁夏',
-  '上海', '重庆', '天津',
+// 中国全部 34 个省级行政区（23省 + 5自治区 + 4直辖市 + 2特别行政区）
+export const CHINA_PROVINCES: string[] = [
+  '北京', '上海', '天津', '重庆',
+  '安徽', '福建', '甘肃', '广东',
+  '广西', '贵州', '海南', '河北',
+  '河南', '黑龙江', '湖北', '湖南',
+  '吉林', '江苏', '江西', '辽宁',
+  '内蒙古', '宁夏', '青海', '山东',
+  '山西', '陕西', '四川', '西藏',
+  '新疆', '云南', '浙江', '香港',
+  '澳门', '台湾',
 ];
+
+export const REGIONS: string[] = ['国考', ...CHINA_PROVINCES];
 
 export const GUOKAO_TYPES: { id: string; label: string; desc: string }[] = [
   { id: '副省类', label: '副省类', desc: '中央机关及其省级直属机构综合管理类' },
@@ -45,7 +47,7 @@ export const GUOKAO_TYPES: { id: string; label: string; desc: string }[] = [
 export const WELCOME_GIFTS = [
   { id: 'pack', title: '上岸资料大礼包', subtitle: '近5年国省考真题集 + 申论范文手册', tag: '免费领' },
   { id: 'vip', title: '7天题库会员体验卡', subtitle: '行测高频考点解析 + 智能组卷刷题', tag: '限新人' },
-  { id: 'job', title: '1对1 选岗求职答疑', subtitle: '专业报考匹配分析 + 历年进面分数线', tag: '推荐' },
+  { id: 'plan', title: '1对1 备考规划答疑', subtitle: '阶段复习规划分析 + 高频考点提分指南', tag: '推荐' },
 ];
 
 export const INITIAL_SUBJECTS: SubjectItem[] = [
@@ -324,11 +326,77 @@ export const QUIZ_QUESTIONS: Record<string, QuizQuestion[]> = {
   })),
 };
 
+export interface CourseTagAsset {
+  src: string;
+  width: number;
+  height: number;
+}
+
+export const COURSE_TAG_ASSETS: Record<string, CourseTagAsset> = {
+  AI助学: { src: '/course-tags/ai-zhuxue.png', width: 1190, height: 380 },
+  专项班: { src: '/course-tags/zhuanxiangban.png', width: 1669, height: 487 },
+  冲刺: { src: '/course-tags/chongci.png', width: 1046, height: 380 },
+  冲刺班: { src: '/course-tags/chongciban.png', width: 1696, height: 487 },
+  刷题班: { src: '/course-tags/shuatiban.png', width: 1699, height: 487 },
+  名师带学: { src: '/course-tags/mingshidaixue.png', width: 1268, height: 380 },
+  基础: { src: '/course-tags/jichu.png', width: 983, height: 380 },
+  备考: { src: '/course-tags/beikao.png', width: 1021, height: 380 },
+  强化: { src: '/course-tags/qianghua.png', width: 982, height: 380 },
+  提高: { src: '/course-tags/tigao.png', width: 1009, height: 380 },
+  智学班: { src: '/course-tags/zhixueban.png', width: 1613, height: 487 },
+  精品班: { src: '/course-tags/jingpinban.png', width: 1549, height: 487 },
+  系统班: { src: '/course-tags/xitongban.png', width: 1822, height: 487 },
+};
+
+export const TEACHER_AVATARS: string[] = [
+  '/src/assets/images/teacher_avatar_male_1_1795663312190.jpg',
+  '/src/assets/images/teacher_avatar_female_1_1795663313755.jpg',
+  '/src/assets/images/teacher_avatar_male_2_1795663314208.jpg',
+  '/src/assets/images/teacher_avatar_female_2_1795663313649.jpg',
+  '/src/assets/images/teacher_avatar_male_3_1795663315552.jpg',
+  '/src/assets/images/ai_teacher_avatar_1795503556865.jpg',
+];
+
+const TEACHER_NAMED_AVATARS: Record<string, string> = {
+  张小龙: TEACHER_AVATARS[0],
+  李梦娇: TEACHER_AVATARS[1],
+  袁东: TEACHER_AVATARS[2],
+  聂佳: TEACHER_AVATARS[3],
+  高照: TEACHER_AVATARS[4],
+  郭熙: TEACHER_AVATARS[0],
+  唐宋: TEACHER_AVATARS[2],
+  AI助教: TEACHER_AVATARS[5],
+};
+
+export function getCourseTeacherAvatars(courseId: string, teachers: string[]): string[] {
+  let seed = 0;
+  for (let i = 0; i < courseId.length; i += 1) {
+    seed = (seed * 31 + courseId.charCodeAt(i)) % 997;
+  }
+  const used = new Set<string>();
+  return teachers.slice(0, 3).map((name, idx) => {
+    const preferred = TEACHER_NAMED_AVATARS[name];
+    if (preferred && !used.has(preferred)) {
+      used.add(preferred);
+      return preferred;
+    }
+    for (let offset = 0; offset < TEACHER_AVATARS.length; offset += 1) {
+      const candidate = TEACHER_AVATARS[(seed + idx * 2 + offset) % TEACHER_AVATARS.length];
+      if (!used.has(candidate)) {
+        used.add(candidate);
+        return candidate;
+      }
+    }
+    return TEACHER_AVATARS[(seed + idx) % TEACHER_AVATARS.length];
+  });
+}
+
 export const COURSES: CourseItem[] = [
   {
     id: 'c1',
     category: '公考笔试',
     region: '安徽',
+    badgeTag: '名师带学',
     title: '国考申论一类大作文模板与写作框架精讲',
     subtitle: '梳理高分写作框架，拆解名师阅卷评分细则与立意拔高技巧',
     dateRange: '2026.11.20 - 2026.12.05',
@@ -342,6 +410,7 @@ export const COURSES: CourseItem[] = [
     id: 'c2',
     category: '公考笔试',
     region: '安徽',
+    badgeTag: '系统班',
     title: '笔试系统班图书大礼包：2027国考/2027安徽省考/系统班轻享版/公考事考综应联报',
     subtitle: '2026.8.21 - 2026.10.30 · 赠全家桶+AI刷题班+突破难题3000等超值权益',
     dateRange: '2026.8.21 - 2026.10.30',
@@ -355,6 +424,7 @@ export const COURSES: CourseItem[] = [
     id: 'c3',
     category: '公考笔试',
     region: '安徽',
+    badgeTag: '冲刺班',
     title: '12.8考前特惠大放送',
     subtitle: '2018.10.17 - 2027.3.3 · 全科目热点押题与冲刺密卷合集',
     dateRange: '2018.10.17 - 2027.3.3',
@@ -365,9 +435,150 @@ export const COURSES: CourseItem[] = [
     syllabus: ['行测高频秒杀公式手册', '政治理论考前300题直播带背', '资料分析速算强化特训', '历年国省考核心考点串讲'],
   },
   {
+    id: 'c7',
+    category: '公考笔试',
+    region: '安徽',
+    badgeTag: '专项班',
+    title: '2027国省考行测判断推理与资料分析高分专项班',
+    subtitle: '聚焦图推规律、逻辑论证与资料速算，逐一击破行测核心失分模块',
+    dateRange: '2026.10.15 - 2026.12.20',
+    tags: ['名师专项课', '高频母题拆解'],
+    priceLabel: '¥360',
+    buyersText: '19420人购买',
+    teachers: ['聂佳', '高照'],
+    syllabus: ['01. 图形推理十大高频规律速判', '02. 逻辑判断加强削弱精准定位', '03. 资料分析截位直除与百化分提速'],
+  },
+  {
+    id: 'c8',
+    category: '公考笔试',
+    region: '安徽',
+    badgeTag: '刷题班',
+    title: '2027公考笔试5000题高强度刷题实战班',
+    subtitle: '每日定时定量带刷近五年国省考真题，讲练结合固化解题肌肉记忆',
+    dateRange: '2026.11.01 - 2027.01.15',
+    tags: ['真题全覆盖', '错题智能复盘'],
+    priceLabel: '¥199',
+    buyersText: '42310人购买',
+    teachers: ['粉笔刷题教研组'],
+    syllabus: ['01. 言语片段阅读与逻辑填空套题带刷', '02. 判断资料双模块限时提速特训', '03. 高频易错母题集中复盘答疑'],
+  },
+  {
+    id: 'c9',
+    category: '公考笔试',
+    region: '安徽',
+    badgeTag: '智学班',
+    title: '2027国省考行测申论AI自适应智学班',
+    subtitle: '基于学情大数据动态生成个人学习路径，精准定位薄弱考点定向提分',
+    dateRange: '2026.09.20 - 2027.03.10',
+    tags: ['个性化学习路径', '学情实时追踪'],
+    priceLabel: '¥980',
+    buyersText: '15890人购买',
+    teachers: ['粉笔智学导师团', 'AI助教'],
+    syllabus: ['01. 入学模考能力图谱诊断', '02. 薄弱知识点定制微课推送', '03. 阶段进阶测评与动态调优'],
+  },
+  {
+    id: 'c10',
+    category: '公考笔试',
+    region: '安徽',
+    badgeTag: '精品班',
+    title: '2027国考省考小班督学全科精品班',
+    subtitle: '严选核心主讲搭配专属班主任全程跟进，直播互动答疑拒绝拖延',
+    dateRange: '2026.10.10 - 2027.03.20',
+    tags: ['1对1学管督学', '阶段测评反馈'],
+    priceLabel: '¥1680',
+    buyersText: '7240人购买',
+    teachers: ['李梦娇', '张小龙', '专属学管师'],
+    syllabus: ['01. 行测申论全科方法精讲直播', '02. 每周全真套卷模考与成绩复盘', '03. 申论作业人工精批与一对一指导'],
+  },
+  {
+    id: 'c11',
+    category: '公考笔试',
+    region: '安徽',
+    badgeTag: 'AI助学',
+    title: '粉笔AI智能刷题与申论自动批改提分营',
+    subtitle: '7×24小时AI精准诊断解题思路，申论小题与大作文秒级逐句润色',
+    dateRange: '2026.10.01 - 2027.04.01',
+    tags: ['AI实时诊断', '写作逐句精批'],
+    priceLabel: '¥128',
+    buyersText: '58320人购买',
+    teachers: ['AI助教', '申论教研组'],
+    syllabus: ['01. AI错题根因剖析与变式巩固', '02. 申论采分点智能比对与批注', '03. 考前每日15分钟碎片记忆推送'],
+  },
+  {
+    id: 'c12',
+    category: '公考笔试',
+    region: '安徽',
+    badgeTag: '基础',
+    title: '2027零基础小白公考行测+申论入门筑基课',
+    subtitle: '从零拆解公考考情与核心题型框架，帮助新手快速建立完整知识体系',
+    dateRange: '2026.09.01 - 2026.11.30',
+    tags: ['考点从零梳理', '配套基础讲义'],
+    priceLabel: '¥99',
+    buyersText: '64150人购买',
+    teachers: ['粉笔基础教研组'],
+    syllabus: ['01. 国省考考情与备考路线导学', '02. 行测五大模块基础概念精讲', '03. 申论材料阅读与作答规范入门'],
+  },
+  {
+    id: 'c13',
+    category: '公考笔试',
+    region: '安徽',
+    badgeTag: '强化',
+    title: '2027省考笔试言语理解与数量关系进阶强化课',
+    subtitle: '针对中高频难题总结秒杀套路，突破行测65分瓶颈向75+冲刺',
+    dateRange: '2026.11.10 - 2027.01.20',
+    tags: ['重难点专项突破', '提速秒杀技巧'],
+    priceLabel: '¥268',
+    buyersText: '23100人购买',
+    teachers: ['郭熙', '唐宋'],
+    syllabus: ['01. 言语意图判断与语句排序高阶技巧', '02. 数量工程/行程/排列组合母题精解', '03. 考场取舍策略与时间分配实战'],
+  },
+  {
+    id: 'c14',
+    category: '公考笔试',
+    region: '安徽',
+    badgeTag: '提高',
+    title: '2027国考申论小题概括与公文写作拔高提高班',
+    subtitle: '精炼材料高频规范词，手把手训练公文格式与要点整合拿满基础分',
+    dateRange: '2026.11.15 - 2027.01.10',
+    tags: ['采分点精准提炼', '真题实操演练'],
+    priceLabel: '¥249',
+    buyersText: '18760人购买',
+    teachers: ['袁东', '张小龙'],
+    syllabus: ['01. 单一题与综合题材料逻辑梳理', '02. 倡议书/汇报提纲/短评高频公文模板', '03. 近三年国考真题逐字精讲'],
+  },
+  {
+    id: 'c15',
+    category: '公考笔试',
+    region: '安徽',
+    badgeTag: '冲刺',
+    title: '2027公考考前15天密卷模考与热点预测冲刺营',
+    subtitle: '考前全真模拟还原考场节奏，串联年度政治理论与时政核心预测点',
+    dateRange: '2027.02.20 - 2027.03.15',
+    tags: ['考前密卷精讲', '时政热点串讲'],
+    priceLabel: '¥88',
+    buyersText: '81420人购买',
+    teachers: ['李梦娇', '粉笔预测教研组'],
+    syllabus: ['01. 考前6套全真预测密卷直播解析', '02. 政治理论与时政高频考点串背', '03. 考场应急提分与心态调整指南'],
+  },
+  {
+    id: 'c16',
+    category: '公考笔试',
+    region: '安徽',
+    badgeTag: '备考',
+    title: '2027国省考全年科学备考规划与真题导学课',
+    subtitle: '分在职与全职定制月度复习节点，赠送历年国省考核心真题电子手册',
+    dateRange: '2026.08.15 - 2027.03.30',
+    tags: ['备考时间表', '历年考情精析', '内含优惠'],
+    priceLabel: '¥19.9',
+    buyersText: '112600人购买',
+    teachers: ['粉笔规划名师团'],
+    syllabus: ['01. 全年三阶段复习计划表拆解', '02. 在职党高效利用碎片时间方法', '03. 考前冲刺策略与历年真题复盘指南'],
+  },
+  {
     id: 'c4',
     category: '事业单位',
     region: '全国',
+    badgeTag: '强化',
     title: '2027事业单位联考《职测+综应》全程系统班',
     subtitle: '紧扣ABCDE五大类考情，精准覆盖公基与综应案例分析',
     dateRange: '2026.10.01 - 2027.03.30',
@@ -381,6 +592,7 @@ export const COURSES: CourseItem[] = [
     id: 'c5',
     category: '就业学院',
     region: '全国',
+    badgeTag: '精品班',
     title: '央国企秋招/春招笔面试通关训练营（行测+EPI+结构化）',
     subtitle: '覆盖国家电网、烟草、三大运营商及五大行网申到终面',
     dateRange: '2026.09.15 - 2027.01.15',
@@ -394,6 +606,7 @@ export const COURSES: CourseItem[] = [
     id: 'c6',
     category: '公考面试',
     region: '安徽',
+    badgeTag: '冲刺',
     title: '公务员结构化面试高分突破实战班（小班模拟+点评）',
     subtitle: '1对1审题破题训练，告别模板化答题，打造考官视角高分表达',
     dateRange: '2026.12.01 - 2027.02.28',
@@ -405,88 +618,106 @@ export const COURSES: CourseItem[] = [
   },
 ];
 
-export const JOB_ANNOUNCEMENTS: JobAnnouncement[] = [
+export const FEATURED_COURSE_COLLECTIONS: FeaturedCourseCollection[] = [
   {
-    id: 'j1',
-    title: '2026年南通市公安局公开招聘警务辅助人员公告（12人）',
-    status: '正在报名',
-    recruitCount: 12,
-    region: '江苏',
-    examType: '招警',
-    category: '派遣/临时/购买服务等',
-    hasBianzhi: false,
-    publishDate: '2026.11.19',
-    deadline: '2026.11.28 17:00',
-    summary: '面向社会公开招聘警务辅助人员12名，主要协助开展治安巡逻、接处警辅助及社区警务工作。',
-    positions: [
-      { id: 'p101', dept: '南通市公安局崇川分局', role: '勤务辅警（治安巡防）', quota: 8, education: '大专及以上', major: '不限专业', applicants: 42 },
-      { id: 'p102', dept: '南通市公安局网安支队', role: '技术辅警（数据分析）', quota: 4, education: '本科及以上', major: '计算机类、电子信息类', applicants: 19 },
+    id: 'fc1',
+    category: '公考笔试',
+    badgeTag: '精品班',
+    headerTitle: '2027上国省考笔试精品班合集',
+    insertIndex: 0,
+    slides: [
+      {
+        id: 'fc1-s1',
+        category: '公考笔试',
+        region: '安徽',
+        badgeTag: '精品班',
+        title: '公考笔试精品一对一【行测/申论/全科】',
+        subtitle: '实力师资定制辅导，针对提升【12月1日起可约课】',
+        dateRange: '2026.12.01 - 2027.03.30',
+        tags: ['备考规划量身打造', '上课时间师资任选'],
+        priceLabel: '¥3600-6400',
+        buyersText: '火热预售中',
+        valueNote: '超值',
+        statusText: '火热预售中',
+        teachers: ['李梦娇', '聂佳', '张小龙'],
+        syllabus: [
+          '01. 1对1入学诊断与专属提分方案定制',
+          '02. 行测弱项模块精准拆解与限时提速训练',
+          '03. 申论小题采分点与大作文逐句人工精批',
+          '04. 考前全真套卷模考复盘与临场应试策略',
+        ],
+      },
+      {
+        id: 'fc1-s2',
+        category: '公考笔试',
+        region: '安徽',
+        badgeTag: '精品班',
+        title: '公考VIP小班全程精品课【行测+申论】',
+        subtitle: '核心名师直播带学，专属班主任阶段督学冲刺',
+        dateRange: '2026.11.25 - 2027.03.25',
+        tags: ['1对1作业精批', '全真模考复盘'],
+        priceLabel: '¥2680-4980',
+        buyersText: '剩余128席位',
+        valueNote: '热销',
+        statusText: '剩余128席位',
+        teachers: ['袁东', '李梦娇', '高照'],
+        syllabus: [
+          '01. 小班互动直播精讲行测申论核心考点',
+          '02. 每周全真套题测评与学管师一对一盯学',
+          '03. 考前热点时政与冲刺密卷全真串讲',
+        ],
+      },
     ],
   },
   {
-    id: 'j2',
-    title: '吉木萨尔县2026年面向社会公开招聘编制外到村工作大学生公告',
-    status: '即将报名',
-    recruitCount: 16,
-    positionCount: 15,
-    region: '新疆',
-    examType: '事业单位',
-    category: '事业单位',
-    hasBianzhi: false,
-    publishDate: '2026.11.19',
-    deadline: '2026.12.02 18:00',
-    summary: '选拔高校毕业生到乡镇村居协助开展乡村振兴、基层治理与党建服务工作，表现优秀者可优先推荐参加专项招录。',
-    positions: [
-      { id: 'p201', dept: '吉木萨尔县三台镇人民政府', role: '到村工作大学生专干', quota: 3, education: '大专及以上', major: '农学类、公共管理类优先', applicants: 11 },
-      { id: 'p202', dept: '吉木萨尔县北庭镇人民政府', role: '基层治理协理员', quota: 2, education: '本科及以上', major: '汉语言文学、法学类', applicants: 9 },
+    id: 'fc2',
+    category: '公考笔试',
+    badgeTag: '系统班',
+    headerTitle: '2027国省考笔试系统班合集',
+    insertIndex: 4,
+    slides: [
+      {
+        id: 'fc2-s1',
+        category: '公考笔试',
+        region: '安徽',
+        badgeTag: '系统班',
+        title: '2027公考笔试全程系统班【基础+刷题+冲刺】',
+        subtitle: '科学分阶备考闭环，全套纸质讲义包邮直达',
+        dateRange: '2026.10.20 - 2027.03.30',
+        tags: ['全科系统精讲', '配套图书礼包'],
+        priceLabel: '¥980-1680',
+        buyersText: '火热预售中',
+        valueNote: '超值',
+        statusText: '火热预售中',
+        teachers: ['张小龙', '高照', '聂佳'],
+        syllabus: [
+          '阶段一：方法精讲筑牢行测与申论底层思维',
+          '阶段二：5000道历年真题分模块强化带刷',
+          '阶段三：套题冲刺与弱项大数据靶向提分',
+        ],
+      },
+      {
+        id: 'fc2-s2',
+        category: '公考笔试',
+        region: '安徽',
+        badgeTag: '系统班',
+        title: '行测申论高分模块系统突破营【提分专项】',
+        subtitle: '直击判断资料与申论大作文，限时提速冲刺75+',
+        dateRange: '2026.11.15 - 2027.02.28',
+        tags: ['高频母题拆解', '考前密卷精讲'],
+        priceLabel: '¥580-980',
+        buyersText: '本周新班开课',
+        valueNote: '优选',
+        statusText: '本周新班开课',
+        teachers: ['袁东', '聂佳', '唐宋'],
+        syllabus: [
+          '01. 判断推理与资料分析高频母题秒杀训练',
+          '02. 申论公文写作与大作文一类文结构实操',
+          '03. 考前冲刺密卷直播解析与错题闭环',
+        ],
+      },
     ],
   },
-  {
-    id: 'j3',
-    title: '2027年北京市各级机关考试录用公务员公告（招录4260人）',
-    status: '正在报名',
-    recruitCount: 4260,
-    positionCount: 2115,
-    region: '北京',
-    examType: '公务员',
-    category: '公务员',
-    hasBianzhi: true,
-    publishDate: '2026.11.18',
-    deadline: '2026.11.25 18:00',
-    summary: '北京市级机关、区级机关及乡镇街道面向社会公开考试录用担任一级主任科员及以下职务公务员。',
-    positions: [
-      { id: 'p301', dept: '北京市发展和改革委员会', role: '综合调研岗（副省类）', quota: 2, education: '硕士研究生及以上', major: '经济学类、公共管理类', applicants: 86 },
-      { id: 'p302', dept: '北京市朝阳区市场监督管理局', role: '行政执法岗', quota: 5, education: '本科及以上', major: '法学类、食品科学与工程', applicants: 124 },
-      { id: 'p303', dept: '北京市海淀区政务服务局', role: '基层综合管理岗', quota: 3, education: '本科及以上', major: '计算机类、管理学类', applicants: 64 },
-    ],
-  },
-  {
-    id: 'j4',
-    title: '2027年度安徽省省直事业单位公开招聘工作人员公告（有编制）',
-    status: '即将报名',
-    recruitCount: 380,
-    positionCount: 210,
-    region: '安徽',
-    examType: '事业单位',
-    category: '事业单位',
-    hasBianzhi: true,
-    publishDate: '2026.11.17',
-    deadline: '2026.12.06 16:00',
-    summary: '安徽省省直属46家事业单位公开招聘专业技术及管理岗位工作人员，全部纳入事业编制管理。',
-    positions: [
-      { id: 'p401', dept: '安徽省政务大数据中心', role: '大数据研发工程师', quota: 2, education: '本科及以上', major: '计算机科学与技术、软件工程', applicants: 31 },
-      { id: 'p402', dept: '安徽省社会科学院', role: '政策研究助理研究员', quota: 2, education: '硕士研究生及以上', major: '政治学、马克思主义理论', applicants: 22 },
-    ],
-  },
-];
-
-export const JOB_EXAM_TYPES: string[] = [
-  '全部', '公务员', '事业单位',
-  '教师', '招警', '选调',
-  '遴选', '大学生村官', '三支一扶',
-  '军队文职', '银行', '农信社',
-  '国企', '派遣/临时/购买服务等', '医疗',
-  '社区工作者', '高校',
 ];
 
 export const INITIAL_FEED_POSTS: FeedPost[] = [
@@ -654,17 +885,6 @@ export const SCREEN_DOCS: ScreenDocNode[] = [
     subtitle: '地区切换与课程目录',
     elements: ['地区定位切换（如安徽）', '分类：公考笔试 / 事业单位 / 就业学院 / 公考面试', '课程卡片（价格、购买人数）'],
     actions: [{ trigger: '点击课程卡片', target: '课程详情弹窗' }],
-  },
-  {
-    id: 'jobmatch',
-    screenshotNo: '10/15/16/17',
-    title: '选岗 Tab（选岗助手）',
-    subtitle: '公告、职位筛选与选岗偏好',
-    elements: ['历年大考 / 国省考汇总 / 职位捡漏榜', '公告 / 职位切换 + 选岗偏好', '考试类型弹窗(15/17)', '完善信息·精准推荐页(16)'],
-    actions: [
-      { trigger: '点击「选岗偏好」或「考试」', target: '考试类型选择弹窗' },
-      { trigger: '点击「完善信息」', target: '完善信息·精准推荐页' },
-    ],
   },
   {
     id: 'discover',

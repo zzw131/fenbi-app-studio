@@ -94,7 +94,7 @@ export const MeTab: React.FC<MeTabProps> = ({
   };
 
   return (
-    <div className="relative flex-1 overflow-y-auto bg-gradient-to-b from-[#E8F1FD] via-[#F5F7FA] to-[#F5F7FA] pb-20 no-scrollbar">
+    <div className="relative flex-1 overflow-y-auto bg-gradient-to-b from-[#E8F1FD] via-[#F5F7FA] to-[#F5F7FA] pb-24 no-scrollbar">
       {/* Top Icons */}
       <div className="px-4 pt-3 flex items-center justify-end gap-3 text-slate-700">
         <button
